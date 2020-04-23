@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dark Matter Simulator</title>
+    <!-- <link rel="stylesheet" type="text/css" href="./css/main.css"> -->
+</head>
+<style>
+    input[type=range][orient=vertical]
+    {
+        writing-mode: bt-lr; /* IE */
+        -webkit-appearance: slider-vertical; /* WebKit */
+        width: 8px;
+        height: 175px;
+        padding: 0 5px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        border: none;
+        height: 26px;
+        width: 26px;
+        border-radius: 50%;
+        background: blue;
+        margin-top: -4px;
+    }
+    body {
+        font-size: 1.5em;
+    }
+</style>
+<body>
+    <!--
+    <div id="sim-root"></div>
+    <script src="dist/bundle.js"></script>
+    -->
+
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr" >
+
+
+        <fieldset>
+            <legend>Total Mass Enclosed</legend>
+            <progress max="1.79e13" id="mass0"></progress><br/>
+            <progress max="1.79e13" id="mass1"></progress><br/>
+            <progress max="1.79e13" id="mass2"></progress><br/>
+            <progress max="1.79e13" id="mass3"></progress><br/>
+            <progress max="1.79e13" id="mass4"></progress><br/>
+            <progress max="1.79e13" id="mass5"></progress><br/>
+            <progress max="1.79e13" id="mass6"></progress><br/>
+            <progress max="1.79e13" id="mass7"></progress><br/>
+            <progress max="1.79e13" id="mass8"></progress><br/>
+            <progress max="1.79e13" id="mass9"></progress><br/>
+        </fieldset>
+
+
+        <fieldset>
+            <legend>Orbital Velocity</legend>
+            <progress max="1.6e3" id="progress0"></progress><br/>
+            <progress max="1.6e3" id="progress1"></progress><br/>
+            <progress max="1.6e3" id="progress2"></progress><br/>
+            <progress max="1.6e3" id="progress3"></progress><br/>
+            <progress max="1.6e3" id="progress4"></progress><br/>
+            <progress max="1.6e3" id="progress5"></progress><br/>
+            <progress max="1.6e3" id="progress6"></progress><br/>
+            <progress max="1.6e3" id="progress7"></progress><br/>
+            <progress max="1.6e3" id="progress8"></progress><br/>
+            <progress max="1.6e3" id="progress9"></progress><br/>
+        </fieldset>
+
+        <fieldset>
+            <legend>Dark Matter Density Input</legend>
+            <input type="range" orient="vertical" id="slide1"/>
+            <input type="range" orient="vertical" id="slide2"/>
+            <input type="range" orient="vertical" id="slide3"/>
+            <input type="range" orient="vertical" id="slide4"/>
+            <input type="range" orient="vertical" id="slide5"/>
+            <input type="range" orient="vertical" id="slide6"/>
+            <input type="range" orient="vertical" id="slide7"/>
+            <input type="range" orient="vertical" id="slide8"/>
+            <input type="range" orient="vertical" id="slide9"/>
+            <input type="range" orient="vertical" id="slide10"/>
+        </fieldset>
+
+        <fieldset><pre id="output2"></pre></fieldset>
+        <fieldset><pre id="output3"></pre></fieldset>
+        <fieldset><pre id="output1"></pre></fieldset>
+    </div>
+
+
+<script type="text/javascript">
+
+    const q = document.querySelector.bind(document);
+    const N_SLIDES = 10;
+
+    const light_year = 9.46E15;
+    const Msun = 1.989E30;
+    const G = 6.67408E-11;
+    const seconds_in_year = 3.154e7;
+    const DM_bin_width = 10.0;
+
+
+    let density = new Array(16);
+    density[0] = 0;
+
+    let volume = new Array(15);
+    let shellMass = new Array(15);
+    let totalMass = new Array(15);
+    let speed = new Array(15);
+
+    function loop() {
+        let output = ""
+
+        /* Collect Slider Input */
+        for (let i=1; i<11; i++) {
+            let s = q(slider(i));
+            let val = s.value;
+            let converted = (val / 100).toFixed(2);
+            // output += `slider${padnum(i)}:  ${converted}` + "\n";
+        }
+
+        /* Calculate Density */
+        // output += "\n"
+        for (let k=0; k<10; k++) {
+            density[k] = q(slider(k+1)).value * 1e-20 / 100
+            output += `density[${padnum(k)}]:  ${density[k].toExponential(2)}` + '  kg/m3 \n';
+        }
+        q("#output1").innerText = output;
+        output = "";
+
+        /* Print Radii */
+        // output += "\n"
+        for (let k=0; k<11; k++) {
+            paddedRadius = `${radius(k)}`.padStart(3, ' ');
+            // output += `radius[${padnum(k)}]:  ${paddedRadius}` + '  kly \n';
+        }
+
+        /* Calculate Volumes */
+        // output += "\n"
+        for (let i = 0; i<10; i++) {
+            volume[i] = 4/3 * Math.PI * (Math.pow(radius(i+1), 3) - Math.pow(radius(i), 3)) * Math.pow(1e3 * light_year, 3);
+            // output += `volume[${padnum(i)}]:  ${volume[i].toExponential(2)}` + '\n';
+        }
+
+        /* Calculate Shell Mass */
+        // output += "\n"
+        for (let k=0; k<10; k++) {
+            shellMass[k] = volume[k] * density[k];
+            // output += `shellMass[${padnum(k)}]:  ${(shellMass[k] / Msun).toExponential(2)}` + '  Msun \n';
+        }
+
+        /* Calculate Total Mass */
+        for (let k=0; k<10; k++) {
+            if (k === 0) {
+                totalMass[0] = shellMass[0];
+            } else {
+                totalMass[k] = totalMass[k-1] + shellMass[k];
+            }
+            let adjusted = totalMass[k] / Msun;
+            q(massProg(k)).value = adjusted;
+            output += `totalMass[${padnum(k)}]:  ${(adjusted).toExponential(2)}` + '  Msun \n'
+        }
+        q("#output2").innerText = output;
+        output = "";
+
+        /* Calculate Total Speed */
+        for (let k=0; k<10; k++) {
+            speed[k] = Math.sqrt(G * totalMass[k] / (radius(k+1) * 1e3 * light_year))
+            let adjustedSpeed = speed[k] / 1e3;
+            output += `speed[${padnum(k)}]:  ${(adjustedSpeed).toExponential(2)}` + '  km/s \n'
+            q(progress(k)).value = adjustedSpeed;
+        }
+        q("#output3").innerText = output;
+
+        window.requestAnimationFrame(loop);
+    }
+
+
+    function slider(n) {
+        return `#slide${n}`
+    }
+
+    function radius(k) {
+        return k * DM_bin_width;
+    }
+
+    function padnum(n) {
+        return `${n}`.padStart(2, ' ');
+    }
+
+    function progress(n) {
+        return `#progress${n}`;
+    }
+
+    function massProg(n) {
+        return `#mass${n}`;
+    }
+
+    function main() {
+
+        const example = [0.8, 0.7, 0.5, 0.2, 0.1, 0.08, 0.06, 0.04, 0.02, 0.01];
+
+        /* Initialize Sliders to Example Values */
+        for (let k=0; k<10; k++) {
+            let s = q(slider(k+1));
+            s.value = example[k] * 100;
+        }
+
+        /* Start Looop */
+        window.requestAnimationFrame(loop);
+    }
+
+    document.addEventListener('DOMContentLoaded', main);
+
+</script>
+</body>
+
+
+
+</html>
