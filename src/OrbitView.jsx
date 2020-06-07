@@ -1,7 +1,6 @@
 import React from 'react';
 import * as PIXI from 'pixi.js';
 
-
 /**
  * Size (in units of pixels) of the PIXI Bitmap for OrbitView.
  * The shape of the PIXI display area is a square, so this value will be used
@@ -13,7 +12,7 @@ export const ORBIT_VIEW_SIZE = 800;
  * Width in pixels of the the controller and graph area, located to the right
  * of the Orbit View area.
  */
-const CONTROL_WIDTH = 667
+const GRAPH_AREA_WIDTH = 667;
 
 /**
  * Size of the underlying "graph", where (0,0) is at the center of the display
@@ -40,12 +39,35 @@ const GRAPH_NORMAL_DATA_POINT_RADIUS = 10;
 /* Radius of the data points on density graph, used as slider handles */
 const GRAPH_SLIDER_HANDLE_DATA_POINT_RADIUS = 20;
 
+const GRAPH_AXIS_LEFT_X = 2 * GRAPH_GRID_SIZE;
+const GRAPH_AXIS_RIGHT_X = GRAPH_AREA_WIDTH - GRAPH_GRID_SIZE;
+const GRAPH_AXIS_WIDTH = GRAPH_AXIS_RIGHT_X - GRAPH_AXIS_LEFT_X;
+const GRAPH_AXIS_HEIGHT = getGraphAxisBottomY(0) - getGraphAxisTopY(0);
+
+const MIN_SLIDER_Y = getGraphAxisTopY(0);
+const MAX_SLIDER_Y = getGraphAxisBottomY(0);
+
 /* Font Settings for Axis Labels (used by Pixi Text) */
 const FONT_DATA_FOR_AXES = {
     fontFamily: 'Georgia',
     fontSize: 26,
     fill: 0xFFFFFF,
 }
+
+function getGraphAxisTopY(n) {
+    return ORBIT_VIEW_SIZE / 3 * n  +  2 * GRAPH_GRID_SIZE;
+}
+
+function getGraphAxisBottomY(n) {
+    return ORBIT_VIEW_SIZE / 3 * (n + 1)  -  2 * GRAPH_GRID_SIZE;
+}
+
+
+
+let sliderValues = new Array(N_SLIDES);
+for (let i = 0; i < N_SLIDES; i++) { sliderValues[i] = 0; }
+
+
 
 /**
  * OrbitView is the main animation display area for the Dark Matter Simulator.
@@ -69,10 +91,10 @@ export default class OrbitView extends React.Component {
     componentDidMount() {
         this.app = new PIXI.Application({
             antialias: true,
-            width: ORBIT_VIEW_SIZE + CONTROL_WIDTH,
+            width: ORBIT_VIEW_SIZE + GRAPH_AREA_WIDTH,
             height: ORBIT_VIEW_SIZE,
-            // resolution: window.devicePixelRatio || 1,
-            // autoDensity: true,
+            resolution: Math.min(window.devicePixelRatio, 3) || 1,
+            autoDensity: true,
         });
         this.app.renderer.plugins.interaction.autoPreventDefault = false;
         this.app.renderer.view.style['touch-action'] = 'auto';
@@ -91,11 +113,11 @@ export default class OrbitView extends React.Component {
                     className="OrbitView"
                     ref={(thisDiv) => { this.pixiElement = thisDiv; }}
                 />
-                {/*
+
                 <pre style={{color: 'white'}}>
                     {JSON.stringify(this.state, null, '\t')}
                 </pre>
-                */}
+
             </React.Fragment>
         )
     }
@@ -108,8 +130,13 @@ export default class OrbitView extends React.Component {
 
     update(delta) {
         this.updateGalaxy(delta);
-        // this.setState({
-        // });
+        this.updateGraphValues();
+        for (let i = 0; i < N_SLIDES; i++) {
+            sliderValues[i] = 1 - (this.densityGraphPoints[i].position.y - getGraphAxisTopY(0)) / GRAPH_AXIS_HEIGHT;
+        }
+        this.setState({
+            sliderValues
+        });
     }
 
     // ------------------------------------------------------------
@@ -171,7 +198,7 @@ export default class OrbitView extends React.Component {
     initGraphs() {
         const g = this.objects.graphs;
 
-        let w = CONTROL_WIDTH;
+        let w = GRAPH_AREA_WIDTH;
         let h = ORBIT_VIEW_SIZE;
         g.x = ORBIT_VIEW_SIZE;
 
@@ -210,7 +237,7 @@ export default class OrbitView extends React.Component {
 
         /* Add Individual Graph Backgrounds */
         let arrowSize = 10
-        let pad = (h/30);
+        let pad = GRAPH_GRID_SIZE;
         let axisLeftX =  2 * pad
         let axisRightX = w - pad;
         let axisBottomY = (graphNum) => h/3 * (graphNum + 1) - 2 * pad;
@@ -241,23 +268,6 @@ export default class OrbitView extends React.Component {
             g.bezierCurveTo(x, yf, x, yf+arrowSize, x+arrowSize, yf+(arrowSize));
         }
 
-
-        /* Add Gridlines to each of the graphs (10 x 10) */
-        // g.lineStyle(1, 0xFFFFFF, 0.2);
-        // for (let i = 0; i < 1; i++) {
-        //     let boxWidth = axisWidth / 10;
-        //     let boxHeight = axisHeight / 10;
-        //     for (let k = 0; k < 10; k++) {
-        //         let horizontalLineY = axisTopY(i) + k*boxHeight;
-        //         let verticalLineX = axisRightX - k*boxWidth;
-        //         g.moveTo(axisLeftX, horizontalLineY);
-        //         g.lineTo(axisRightX, horizontalLineY);
-        //         g.moveTo(verticalLineX, axisTopY(i));
-        //         g.lineTo(verticalLineX, axisBottomY(i));
-        //     }
-        // }
-        //
-
         /* Graph Labels */
 
         const titleTexts = [
@@ -269,7 +279,7 @@ export default class OrbitView extends React.Component {
         for (let i = 0; i < titleTexts.length; i++) {
             const t = new PIXI.Text(titleTexts[i], FONT_DATA_FOR_AXES);
             t.anchor.set(0, 0.5)
-            t.resolution = 2;
+            // t.resolution = 2;
             t.x = pad;
             t.y = axisTopY(i) - pad;
             g.addChild(t);
@@ -278,7 +288,7 @@ export default class OrbitView extends React.Component {
         for (let i = 0; i < 3; i++) {
             const t = new PIXI.Text('Radius (kly)', FONT_DATA_FOR_AXES);
             t.anchor.set(0.5);
-            t.resolution = 2;
+            // t.resolution = 2;
             t.x = axisLeftX + axisWidth/2;
             t.y = axisBottomY(i) + pad;
             g.addChild(t);
@@ -296,17 +306,30 @@ export default class OrbitView extends React.Component {
         }
         g.addChild(tracks);
 
+
         /* Create Data Points */
         for (let graphNum = 0; graphNum < 3; graphNum ++) {
             const container = new PIXI.Container();
             for (let i = 0; i < N_SLIDES; i++) {
-                const point = (graphNum == 0) ? newSpecialInputDataPointGraph() : newRedDataPointGraphic();
+                let point;
+                switch (graphNum) {
+                case 0:
+                    point = newSpecialInputDataPointGraph();
+                    this.densityGraphPoints[i] = point;
+                    break;
+                case 1:
+                    point = newRedDataPointGraphic();
+                    this.velocityGraphPoints[i] = point;
+                    break;
+                default:
+                    point = newRedDataPointGraphic();
+                    this.massGraphPoints[i] = point;
+                    break;
+                }
                 point.x = axisLeftX + 2 * (i + 1) * GRAPH_GRID_SIZE;
                 point.y = axisBottomY(graphNum) - Math.random() * axisHeight;
-                this.densityGraphPoints[i] = point;
                 container.addChild(point);
             }
-
             g.addChild(container);
         }
 
@@ -331,6 +354,10 @@ export default class OrbitView extends React.Component {
             dots[k].x = xPixels(R * Math.cos(theta));
             dots[k].y = yPixels(R * Math.sin(theta));
         }
+    }
+
+    updateGraphValues() {
+        
     }
 }
 
@@ -363,6 +390,13 @@ function newRedDataPointGraphic() {
 function newSpecialInputDataPointGraph() {
     const g = new PIXI.Graphics();
     const r = GRAPH_SLIDER_HANDLE_DATA_POINT_RADIUS;
+    g.interactive = true;
+    g.buttonMode = true;
+    g
+        .on('pointermove', onDataPointDragMove)
+        .on('pointerdown', onDataPointDragStart)
+        .on('pointerup', onDataPointDragEnd)
+        .on('pointerupoutside', onDataPointDragEnd)
     g.lineStyle(3, 0xFFFFFF, 0.4);
     g.beginFill(0xFF1122, 0.7);
     g.drawCircle(0, 0, r);
@@ -372,6 +406,25 @@ function newSpecialInputDataPointGraph() {
     g.lineTo(-r/2, 0);
     g.endFill();
     return g;
+}
+
+function onDataPointDragStart(event) {
+    this.data = event.data;
+    this.alpha = 0.5;
+    this.dragging = true;
+}
+
+function onDataPointDragEnd() {
+    this.alpha = 1;
+    this.dragging = false;
+    this.data = null;
+}
+
+function onDataPointDragMove(event) {
+    if (this.dragging) {
+        const newPosition = this.data.getLocalPosition(this.parent);
+        this.y = Math.max(Math.min(newPosition.y, MAX_SLIDER_Y), MIN_SLIDER_Y);
+    }
 }
 
 /* Converts Graph Units to Pixels (x-dimension) */
