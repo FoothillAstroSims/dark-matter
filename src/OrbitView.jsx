@@ -63,6 +63,7 @@ function getGraphAxisBottomY(n) {
 }
 
 
+let pixiApp;
 
 let sliderValues = new Array(N_SLIDES);
 for (let i = 0; i < N_SLIDES; i++) { sliderValues[i] = 0; }
@@ -96,6 +97,7 @@ export default class OrbitView extends React.Component {
             resolution: Math.min(window.devicePixelRatio, 3) || 1,
             autoDensity: true,
         });
+        pixiApp = this.app;
         this.app.renderer.plugins.interaction.autoPreventDefault = false;
         this.app.renderer.view.style['touch-action'] = 'auto';
         this.pixiElement.appendChild(this.app.view);
@@ -357,7 +359,7 @@ export default class OrbitView extends React.Component {
     }
 
     updateGraphValues() {
-        
+
     }
 }
 
@@ -409,6 +411,7 @@ function newSpecialInputDataPointGraph() {
 }
 
 function onDataPointDragStart(event) {
+    event.data.originalEvent.preventDefault();
     this.data = event.data;
     this.alpha = 0.5;
     this.dragging = true;
