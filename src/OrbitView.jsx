@@ -1,4 +1,5 @@
 import React from 'react';
+import Galaxy, {DEFAULT_DENSITY_DATA} from './galaxy.js';
 import * as PIXI from 'pixi.js';
 
 /**
@@ -22,7 +23,7 @@ const GRAPH_AREA_WIDTH = 667;
 const MAX_GRAPH_SIZE = 1;
 
 /* Number of star sprites to randomly generate in the galaxy simulation. */
-const DOTS_TO_GENERATE = 300;
+const DOTS_TO_GENERATE = 500;
 
 /* The size of the grid hash-marks in the Galaxy Viewport Area. */
 const GALAXY_GRID_LINE_SIZE = 0.025;
@@ -47,6 +48,8 @@ const GRAPH_AXIS_HEIGHT = getGraphAxisBottomY(0) - getGraphAxisTopY(0);
 const MIN_SLIDER_Y = getGraphAxisTopY(0);
 const MAX_SLIDER_Y = getGraphAxisBottomY(0);
 
+const GRAPH_MAX_ORBITAL_VELOCITY = 1506;
+
 /* Font Settings for Axis Labels (used by Pixi Text) */
 const FONT_DATA_FOR_AXES = {
     fontFamily: 'Georgia',
@@ -64,6 +67,7 @@ function getGraphAxisBottomY(n) {
 
 
 let pixiApp;
+let galaxy = new Galaxy();
 
 let sliderValues = new Array(N_SLIDES);
 for (let i = 0; i < N_SLIDES; i++) { sliderValues[i] = 0; }
@@ -87,6 +91,8 @@ export default class OrbitView extends React.Component {
         this.densityGraphPoints = new Array(10);
         this.velocityGraphPoints = new Array(10);
         this.massGraphPoints = new Array(10);
+        this.velocityGraphData = new Array(10);
+        this.massGraphData = new Array(10);
     }
 
     componentDidMount() {
@@ -115,11 +121,7 @@ export default class OrbitView extends React.Component {
                     className="OrbitView"
                     ref={(thisDiv) => { this.pixiElement = thisDiv; }}
                 />
-
-                <pre style={{color: 'white'}}>
-                    {JSON.stringify(this.state, null, '\t')}
-                </pre>
-
+                {/* <pre style={{color: 'white'}}>{JSON.stringify(this.state, null, '\t')}</pre> */}
             </React.Fragment>
         )
     }
@@ -132,12 +134,20 @@ export default class OrbitView extends React.Component {
 
     update(delta) {
         this.updateGalaxy(delta);
-        this.updateGraphValues();
         for (let i = 0; i < N_SLIDES; i++) {
             sliderValues[i] = 1 - (this.densityGraphPoints[i].position.y - getGraphAxisTopY(0)) / GRAPH_AXIS_HEIGHT;
         }
+        galaxy.updateData(sliderValues);
+        for (let k = 0; k < N_SLIDES; k++) {
+            this.velocityGraphData[k] = galaxy.getOrbitalVelocity(k);
+            this.massGraphData[k] = galaxy.getTotalMassEnclosed(k);
+            this.velocityGraphPoints[k].y = getGraphAxisBottomY(1) - galaxy.getOrbitalVelocityNormalized(k) * GRAPH_AXIS_HEIGHT;
+            this.massGraphPoints[k].y = getGraphAxisBottomY(2) - galaxy.getTotalMassEnclosedNormalized(k) * GRAPH_AXIS_HEIGHT;
+        }
         this.setState({
-            sliderValues
+            sliderValues: sliderValues,
+            massGraphData: this.massGraphData,
+            velocityGraphData: this.velocityGraphData,
         });
     }
 
@@ -334,6 +344,9 @@ export default class OrbitView extends React.Component {
             }
             g.addChild(container);
         }
+        for (let k = 0; k < N_SLIDES; k++) {
+            this.densityGraphPoints[k].y = getGraphAxisBottomY(0) - DEFAULT_DENSITY_DATA[k] * axisHeight;
+        }
 
         g.endFill();
     }
@@ -349,17 +362,12 @@ export default class OrbitView extends React.Component {
         for (let k = 0; k< DOTS_TO_GENERATE; k++) {
             let R = radiuses[k];
             let shell = getShellFromDot(R);
-            // let adjustedSpeed = speed[shell] / 1.58e6;
-            let adjustedSpeed = 0.2 * R;
-            thetas[k] += 0.05 * adjustedSpeed * delta;
+            let speed = galaxy.getOrbitalVelocityNormalized(getShellFromDot(R));
+            thetas[k] += 0.05 * speed * delta;
             let theta = thetas[k];
             dots[k].x = xPixels(R * Math.cos(theta));
             dots[k].y = yPixels(R * Math.sin(theta));
         }
-    }
-
-    updateGraphValues() {
-
     }
 }
 
