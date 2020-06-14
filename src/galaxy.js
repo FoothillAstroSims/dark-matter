@@ -9,6 +9,11 @@ const MSUN = 1.989e30;
 const G = 6.67408e-11;
 const SECONDS_PER_YEAR = 3.154e7;
 
+export const MAX_DENSITY = 1e-20;
+export const MAX_VELOCITY = 1582;
+export const MAX_RADIUS = DM_BIN_WIDTH * NUM_POINTS;
+export const MAX_MASS_ENCLOSED = 1.783e13;
+
 export const DEFAULT_DENSITY_DATA = [0.8, 0.7, 0.5, 0.2, 0.1, 0.08, 0.06, 0.04, 0.02, 0.01];
 
 export default class Galaxy {
@@ -39,6 +44,14 @@ export default class Galaxy {
         this._updateAll();
     }
 
+    getRadiusPerPoint() {
+        return DM_BIN_WIDTH;
+    }
+
+    getDensity(k) {
+        return this.density[k];
+    }
+
     /** 
      * Oribtal Velocity of k-th data point, in units of km/s
      */
@@ -47,7 +60,7 @@ export default class Galaxy {
     }
 
     getOrbitalVelocityNormalized(k) {
-        return this.orbitalVelocity[k] / 1582e3;
+        return this.orbitalVelocity[k] / 1e3/ MAX_VELOCITY;
     }
 
     /**
@@ -58,12 +71,12 @@ export default class Galaxy {
     }
 
     getTotalMassEnclosedNormalized(k) {
-        return this.totalMass[k] / (1.783e13 * MSUN);
+        return this.totalMass[k] / MSUN /MAX_MASS_ENCLOSED;
     }
 
     _updateAll() {
         for (let k = 0; k < NUM_POINTS; k++) {
-            this.density[k] = this.sliderData[k] * 1e-20;
+            this.density[k] = this.sliderData[k] * MAX_DENSITY;
             this.volume[k] = 4 / 3 * Math.PI * (Math.pow(radius(k), 3) - Math.pow(radius(k - 1), 3)) * Math.pow(1e3 * LIGHT_YEAR, 3);
             this.shellMass[k] = this.volume[k] * this.density[k];
             this.totalMass[k] = (k === 0) ? this.shellMass[k] : (this.totalMass[k-1] + this.shellMass[k]);
