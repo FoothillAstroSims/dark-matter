@@ -383,7 +383,7 @@ export default class OrbitView extends React.Component {
         let max_y_values = [MAX_DENSITY, MAX_VELOCITY, MAX_MASS_ENCLOSED];
         for (let i = 0; i < 3; i++) {
             for (let k = 0; k < 6; k++) {
-                let rawVal = max_y_values[i] * k / 6;
+                let rawVal = max_y_values[i] * (k+1) / 6;
                 let val;
                 if (i == 1) {
                     val = Math.round(rawVal);
