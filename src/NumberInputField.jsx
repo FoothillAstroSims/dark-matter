@@ -40,7 +40,7 @@ export default class NumberInputField extends React.Component {
     handleFocus() {
         this.setState({
             hasFocus: true,
-            value: this.props.value
+            value: this.props.value.toExponential(2)
         });
     }
 

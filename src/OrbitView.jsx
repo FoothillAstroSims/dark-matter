@@ -126,7 +126,7 @@ export default class OrbitView extends React.Component {
             antialias: true,
             width: ORBIT_VIEW_SIZE + GRAPH_AREA_WIDTH,
             height: ORBIT_VIEW_SIZE,
-            resolution: Math.min(window.devicePixelRatio, 3) || 1,
+            resolution: Math.min(window.devicePixelRatio, 2) || 1,
             autoDensity: true,
         });
         this.app.renderer.plugins.interaction.autoPreventDefault = false;
@@ -152,7 +152,6 @@ export default class OrbitView extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        console.log("updated.", prevProps, this.props);
         if (this.props.isDarkMatterGlowEnabled !== prevProps.isDarkMatterGlowEnabled) {
             this.objects.densityRings.visible = this.props.isDarkMatterGlowEnabled;
         }
@@ -388,7 +387,7 @@ export default class OrbitView extends React.Component {
                 if (i == 1) {
                     val = Math.round(rawVal);
                 } else {
-                    val = Number.parseFloat(rawVal).toExponential(0);
+                    val = Number.parseFloat(rawVal).toExponential(1);
                 }
                 const t = new PIXI.Text(val, FONT_DATA_FOR_Y_AXIS_GRIDLINE_LABELS);
                 t.anchor.set(1, 0.5);
@@ -448,7 +447,7 @@ export default class OrbitView extends React.Component {
      */
     initDataPointText() {
         let textArrays = [this.densityDataText, this.velocityDataText, this.massDataText];
-        for (let i = 0; i < 3; i++) {
+        for (let i = 1; i < 3; i++) {
             for (let k = 0; k < 10; k++) {
                 const t = new PIXI.Text("xxx", FONT_DATA_FOR_POINTS);
                 t.anchor.set(0.5);
@@ -479,7 +478,7 @@ export default class OrbitView extends React.Component {
         let dataArrays = [this.densityGraphData, this.velocityGraphData, this.massGraphData];
         let pointArrays = [this.densityGraphPoints, this.velocityGraphPoints, this.massGraphPoints];
         let textArrays = [this.densityDataText, this.velocityDataText, this.massDataText];
-        for (let i = 0; i < 3; i++) {
+        for (let i = 1; i < 3; i++) {
             for (let k = 0; k < 10; k++) {
                 textArrays[i][k].position.set(pointArrays[i][k].x, pointArrays[i][k].y - 15);
                 if (i == 1) {
@@ -512,11 +511,9 @@ export default class OrbitView extends React.Component {
             .on('pointerdown', this.onDataPointDragStart)
             .on('pointerup', this.onDataPointDragEnd)
             .on('pointerupoutside', this.onDataPointDragEnd)
-        g.lineStyle(3, 0xFFFFFF, 0.4);
         g.beginFill(0xFF1122, 0.7);
+        g.lineStyle(3, 0xFFFFFF, 0.4);
         g.drawCircle(0, 0, r);
-        // g.moveTo(0, r/2);
-        // g.lineTo(0, -r/2);
         g.moveTo(r/2, 0);
         g.lineTo(-r/2, 0);
         g.endFill();
@@ -543,8 +540,6 @@ export default class OrbitView extends React.Component {
             let key = getSliderIndexFromPosition(this.x);
             let val = ((MAX_SLIDER_Y - this.y) / GRAPH_AXIS_HEIGHT) * MAX_DENSITY;
             singleton.props.onDensityChange(key, val);
-            // console.log(key, val);
-            console.log(event);
         }
     }
 

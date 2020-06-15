@@ -1,5 +1,6 @@
 import React from 'react';
-import NumberInputField from './NumberInputField';
+import NumberInputField from './NumberInputField.jsx';
+import {MAX_DENSITY} from './galaxy.js';
 
 export default class Controls extends React.Component {
     constructor(props) {
@@ -14,7 +15,7 @@ export default class Controls extends React.Component {
                     id={`densityInputBox${k}`}
                     value={this.props.density[k]}
                     min={0}
-                    max={8e-21}
+                    max={MAX_DENSITY}
                     key={k}
                     name={k}
                     sliderKey={k}
