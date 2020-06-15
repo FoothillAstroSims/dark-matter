@@ -1,34 +1,11 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="UTF-8" />
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
     <title>Dark Matter Simulator</title>
-    <!-- <link rel="stylesheet" type="text/css" href="./css/main.css"> -->
 </head>
 <style>
-    /* 
-    input[type=range][orient=vertical]
-    {
-        writing-mode: bt-lr;
-        -webkit-appearance: slider-vertical;
-        width: 8px;
-        height: 175px;
-        padding: 0 10px;
-    }
-    input[type=range]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        border: none;
-        height: 26px;
-        width: 26px;
-        border-radius: 50%;
-        background: blue;
-        margin-top: -4px;
-    }
-     */
-
-
     body {
         font-size: 1.5em;
         background: black;
@@ -45,16 +22,26 @@
     }
 
     #darkMatterGlow-container {
+        background: linear-gradient(0deg, #2a0100, #0e0e0e);
         border: 1px solid #686363;
         border-radius: 5px;
         padding: 2px;
         color: white;
         position: absolute;
-        top: 760px;
+        top: 15px;
         left: 625px;
         font-size: 16px;
         cursor: pointer;
         user-select: none;
+    }
+
+    #darkMatterGlow-container:hover {
+        background: linear-gradient(0deg, #3e0100, #212121);
+        border-color: white;
+    }
+
+    #darkMatterGlow-container:active {
+        background: radial-gradient(#a23838, #3d1111);
     }
 
     #darkMatterGlow-label {
@@ -72,11 +59,14 @@
     .densityInputBox {
         padding: 1.5px;
         border: 2px inset #d5d5d5;
+        border-radius: 3px;
         margin: 0.75px;
         width: 45px;
         height: 15px;
         font-size: 10px;
         display: inline-block;
+        background: linear-gradient(0deg, #2d2222, #121212);
+        color: #74ddff;
     }
 
     #densityInputBox-container {
@@ -86,14 +76,9 @@
         /* display: inline-block; */
         width: 800px;
     }
-
-
 </style>
 <body>
     <div id="sim-root"></div>
     <script src="dist/bundle.js"></script>
 </body>
-
-
-
 </html>
