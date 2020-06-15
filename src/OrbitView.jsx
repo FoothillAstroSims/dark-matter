@@ -57,7 +57,7 @@ const FONT_DATA_FOR_AXES = {
 
 const FONT_DATA_FOR_X_AXIS_TITLE = {
     fontFamily: 'Georgia',
-    fontSize: 20,
+    fontSize: 16,
     fill: 0xFFFFFF,
 }
 
@@ -88,7 +88,7 @@ let galaxy = new Galaxy();
 let sliderValues = new Array(N_SLIDES);
 for (let i = 0; i < N_SLIDES; i++) { sliderValues[i] = 0; }
 
-
+let singleton;
 
 /**
  * OrbitView is the main animation display area for the Dark Matter Simulator.
@@ -98,6 +98,7 @@ for (let i = 0; i < N_SLIDES; i++) { sliderValues[i] = 0; }
 export default class OrbitView extends React.Component {
     constructor(props) {
         super(props);
+        singleton = this;
         this.state = {};
         this.objects = {
             densityRings: new PIXI.Container(),
@@ -148,6 +149,16 @@ export default class OrbitView extends React.Component {
                 {/* <pre style={{color: 'white'}}>{JSON.stringify(this.state, null, '\t')}</pre> */}
             </React.Fragment>
         )
+    }
+
+    componentDidUpdate(prevProps) {
+        console.log("updated.", prevProps, this.props);
+        if (this.props.isDarkMatterGlowEnabled !== prevProps.isDarkMatterGlowEnabled) {
+            this.objects.densityRings.visible = this.props.isDarkMatterGlowEnabled;
+        }
+        for (let k = 0; k < 10; k++) {
+            this.densityGraphPoints[k].position.y = MAX_SLIDER_Y - (this.props.density[k] / MAX_DENSITY) * GRAPH_AXIS_HEIGHT;
+        }
     }
 
     init() {
@@ -342,8 +353,8 @@ export default class OrbitView extends React.Component {
             const t = new PIXI.Text(titleTexts[i], FONT_DATA_FOR_AXES);
             t.anchor.set(0, 0.5)
             // t.resolution = 2;
-            t.x = pad;
-            t.y = axisTopY(i) - pad;
+            t.x = 0.5 * pad;
+            t.y = axisTopY(i) - pad * (i===0? 1.5 : 1);
             g.addChild(t);
         }
 
@@ -407,7 +418,7 @@ export default class OrbitView extends React.Component {
                 let point;
                 switch (graphNum) {
                 case 0:
-                    point = newSpecialInputDataPointGraph();
+                    point = this.newSpecialInputDataPointGraph(i);
                     this.densityGraphPoints[i] = point;
                     break;
                 case 1:
@@ -485,6 +496,58 @@ export default class OrbitView extends React.Component {
             this.redGlowRings[k].alpha = sliderValues[k];
         }
     }
+
+    // -----------------------------------------------------------------
+    // Creation of New Slider Dots
+    // -----------------------------------------------------------------
+
+    /* generates a  data point for usage as a slider handle */
+    newSpecialInputDataPointGraph(key) {
+        const g = new PIXI.Graphics();
+        const r = GRAPH_SLIDER_HANDLE_DATA_POINT_RADIUS;
+        g.interactive = true;
+        g.buttonMode = true;
+        g
+            .on('pointermove', this.onDataPointDragMove)
+            .on('pointerdown', this.onDataPointDragStart)
+            .on('pointerup', this.onDataPointDragEnd)
+            .on('pointerupoutside', this.onDataPointDragEnd)
+        g.lineStyle(3, 0xFFFFFF, 0.4);
+        g.beginFill(0xFF1122, 0.7);
+        g.drawCircle(0, 0, r);
+        // g.moveTo(0, r/2);
+        // g.lineTo(0, -r/2);
+        g.moveTo(r/2, 0);
+        g.lineTo(-r/2, 0);
+        g.endFill();
+        return g;
+}
+
+    onDataPointDragStart(event) {
+        event.data.originalEvent.preventDefault();
+        this.data = event.data;
+        this.alpha = 0.5;
+        this.dragging = true;
+    }
+
+    onDataPointDragEnd() {
+        this.alpha = 1;
+        this.dragging = false;
+        this.data = null;
+    }
+
+    onDataPointDragMove(event) {
+        if (this.dragging) {
+            const newPosition = this.data.getLocalPosition(this.parent);
+            this.y = Math.max(Math.min(newPosition.y, MAX_SLIDER_Y), MIN_SLIDER_Y);
+            let key = getSliderIndexFromPosition(this.x);
+            let val = ((MAX_SLIDER_Y - this.y) / GRAPH_AXIS_HEIGHT) * MAX_DENSITY;
+            singleton.props.onDensityChange(key, val);
+            // console.log(key, val);
+            console.log(event);
+        }
+    }
+
 }
 
 
@@ -512,46 +575,12 @@ function newRedDataPointGraphic() {
     return g;
 }
 
-/* generates a  data point for usage as a slider handle */
-function newSpecialInputDataPointGraph() {
-    const g = new PIXI.Graphics();
-    const r = GRAPH_SLIDER_HANDLE_DATA_POINT_RADIUS;
-    g.interactive = true;
-    g.buttonMode = true;
-    g
-        .on('pointermove', onDataPointDragMove)
-        .on('pointerdown', onDataPointDragStart)
-        .on('pointerup', onDataPointDragEnd)
-        .on('pointerupoutside', onDataPointDragEnd)
-    g.lineStyle(3, 0xFFFFFF, 0.4);
-    g.beginFill(0xFF1122, 0.7);
-    g.drawCircle(0, 0, r);
-    // g.moveTo(0, r/2);
-    // g.lineTo(0, -r/2);
-    g.moveTo(r/2, 0);
-    g.lineTo(-r/2, 0);
-    g.endFill();
-    return g;
-}
-
-function onDataPointDragStart(event) {
-    event.data.originalEvent.preventDefault();
-    this.data = event.data;
-    this.alpha = 0.5;
-    this.dragging = true;
-}
-
-function onDataPointDragEnd() {
-    this.alpha = 1;
-    this.dragging = false;
-    this.data = null;
-}
-
-function onDataPointDragMove(event) {
-    if (this.dragging) {
-        const newPosition = this.data.getLocalPosition(this.parent);
-        this.y = Math.max(Math.min(newPosition.y, MAX_SLIDER_Y), MIN_SLIDER_Y);
-    }
+/* WARNING: This Function makes the assumption that sliders are evenly spaced
+along the x-axis.  If that were to change, it would break this function. */
+function getSliderIndexFromPosition(x) {
+    let x0 = GRAPH_AXIS_LEFT_X + 2 * GRAPH_GRID_SIZE;
+    let diff = 2 * GRAPH_GRID_SIZE;
+    return Math.round((x - x0) / diff);
 }
 
 /* Converts Graph Units to Pixels (x-dimension) */

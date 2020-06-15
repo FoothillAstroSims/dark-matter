@@ -3,15 +3,16 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
     <title>Dark Matter Simulator</title>
     <!-- <link rel="stylesheet" type="text/css" href="./css/main.css"> -->
 </head>
 <style>
+    /* 
     input[type=range][orient=vertical]
     {
-        writing-mode: bt-lr; /* IE */
-        -webkit-appearance: slider-vertical; /* WebKit */
+        writing-mode: bt-lr;
+        -webkit-appearance: slider-vertical;
         width: 8px;
         height: 175px;
         padding: 0 10px;
@@ -25,67 +26,70 @@
         background: blue;
         margin-top: -4px;
     }
+     */
+
+
     body {
         font-size: 1.5em;
         background: black;
     }
+
+    /* Hide the arrows in the number input boxes */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    #darkMatterGlow-container {
+        border: 1px solid #686363;
+        border-radius: 5px;
+        padding: 2px;
+        color: white;
+        position: absolute;
+        top: 760px;
+        left: 625px;
+        font-size: 16px;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    #darkMatterGlow-label {
+        display: inline-block;
+        width: 100px;
+    }
+
+    #darkMatterGlow-checkbox {
+        cursor: pointer;
+        width: 25px;
+        height: 25px;
+        margin: 10px;
+    }
+
+    .densityInputBox {
+        padding: 1.5px;
+        border: 2px inset #d5d5d5;
+        margin: 0.75px;
+        width: 45px;
+        height: 15px;
+        font-size: 10px;
+        display: inline-block;
+    }
+
+    #densityInputBox-container {
+        position: absolute;
+        top: 30px;
+        left: 887px;
+        /* display: inline-block; */
+        width: 800px;
+    }
+
+
 </style>
 <body>
-    <!--
-    <div id="sim-root"></div>
-    <script src="dist/bundle.js"></script>
-    -->
-<!--
-    <div style="display:grid; grid-template-columns:1fr 1fr 1fr" >
-
-
-        <fieldset>
-            <legend>Total Mass Enclosed</legend>
-            <progress max="1.79e13" id="mass0"></progress><br/>
-            <progress max="1.79e13" id="mass1"></progress><br/>
-            <progress max="1.79e13" id="mass2"></progress><br/>
-            <progress max="1.79e13" id="mass3"></progress><br/>
-            <progress max="1.79e13" id="mass4"></progress><br/>
-            <progress max="1.79e13" id="mass5"></progress><br/>
-            <progress max="1.79e13" id="mass6"></progress><br/>
-            <progress max="1.79e13" id="mass7"></progress><br/>
-            <progress max="1.79e13" id="mass8"></progress><br/>
-            <progress max="1.79e13" id="mass9"></progress><br/>
-        </fieldset>
-
-
-        <fieldset>
-            <legend>Orbital Velocity</legend>
-            <progress max="1.6e3" id="progress0"></progress><br/>
-            <progress max="1.6e3" id="progress1"></progress><br/>
-            <progress max="1.6e3" id="progress2"></progress><br/>
-            <progress max="1.6e3" id="progress3"></progress><br/>
-            <progress max="1.6e3" id="progress4"></progress><br/>
-            <progress max="1.6e3" id="progress5"></progress><br/>
-            <progress max="1.6e3" id="progress6"></progress><br/>
-            <progress max="1.6e3" id="progress7"></progress><br/>
-            <progress max="1.6e3" id="progress8"></progress><br/>
-            <progress max="1.6e3" id="progress9"></progress><br/>
-        </fieldset>
-
-        <fieldset>
-            <legend>Dark Matter Density Input</legend>
-            <input type="range" orient="vertical" id="slide1"/>
-            <input type="range" orient="vertical" id="slide2"/>
-            <input type="range" orient="vertical" id="slide3"/>
-            <input type="range" orient="vertical" id="slide4"/>
-            <input type="range" orient="vertical" id="slide5"/>
-            <input type="range" orient="vertical" id="slide6"/>
-            <input type="range" orient="vertical" id="slide7"/>
-            <input type="range" orient="vertical" id="slide8"/>
-            <input type="range" orient="vertical" id="slide9"/>
-            <input type="range" orient="vertical" id="slide10"/>
-        </fieldset>
-
-        <fieldset><pre id="output2"></pre></fieldset>
-        <fieldset><pre id="output3"></pre></fieldset>
-        <fieldset><pre id="output1"></pre></fieldset>
-    </div> -->
     <div id="sim-root"></div>
     <script src="dist/bundle.js"></script>
 </body>

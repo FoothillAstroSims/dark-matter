@@ -1,4 +1,5 @@
 import React from 'react';
+import NumberInputField from './NumberInputField';
 
 export default class Controls extends React.Component {
     constructor(props) {
@@ -6,33 +7,48 @@ export default class Controls extends React.Component {
     }
 
     render() {
-        const sliders = this.props.controls.sliders.map((v, k) => {
+        const boxes = this.props.density.map((v, k) => {
             return (
-                <input
-                    type="range"
-                    orient="vertical"
-                    id={`slider{k}`}
-                    value={v}
+                <NumberInputField
+                    type="number"
+                    id={`densityInputBox${k}`}
+                    value={this.props.density[k]}
+                    min={0}
+                    max={8e-21}
                     key={k}
                     name={k}
+                    sliderKey={k}
                     onChange={this.onChange.bind(this)}
-                ></input>
+                />
             )
         });
 
         return (
             <React.Fragment>
-            <fieldset>
-                <legend>Dark Matter Density Input</legend>
-                {sliders}
-            </fieldset>
+            <div id="darkMatterGlow-container" onClick={this.onCheckBoxClick.bind(this)}>
+                <input 
+                    id="darkMatterGlow-checkbox"
+                    type="checkbox" 
+                    checked={this.props.isDarkMatterGlowEnabled}
+                    onChange={this.onChange.bind(this)} 
+                />
+                <div id="darkMatterGlow-label">
+                    Show Dark Matter Glow
+                </div>
+            </div>
+            <div id="densityInputBox-container">
+                {boxes}
+            </div>
             </React.Fragment>
         );
     }
 
-    onChange(event) {
-        let sliders = this.props.controls.sliders;
-        sliders[parseInt(event.target.name)] = parseFloat(event.target.value);
-        this.props.onChange(sliders)
+    onChange(key, value) {
+        console.log(`key=${key}, value=${value}`);
+        this.props.onDensityChange(key, value);
+    }
+
+    onCheckBoxClick() {
+        this.props.onChange("isDarkMatterGlowEnabled", !this.props.isDarkMatterGlowEnabled);
     }
 }
