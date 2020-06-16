@@ -1,6 +1,8 @@
 import React from 'react';
 import Galaxy, {DEFAULT_DENSITY_DATA, MAX_DENSITY, MAX_VELOCITY, MAX_MASS_ENCLOSED} from './galaxy.js';
 import * as PIXI from 'pixi.js';
+import {GALAXIES, GALAXY_DATA} from './galaxyData.js';
+import VelocityCurveOverlay from './VelocityCurveOverlay.js'
 
 /**
  * Size (in units of pixels) of the PIXI Bitmap for OrbitView.
@@ -100,12 +102,17 @@ export default class OrbitView extends React.Component {
         super(props);
         singleton = this;
         this.state = {};
+
+        this.velocityCurveOverlay = new VelocityCurveOverlay();
+
         this.objects = {
             densityRings: new PIXI.Container(),
             background: new PIXI.Graphics(),
             galaxy: new PIXI.Graphics(),
             graphs: new PIXI.Graphics(),
         };
+
+
         this.densityGraphPoints = new Array(10);
         this.velocityGraphPoints = new Array(10);
         this.massGraphPoints = new Array(10);
@@ -155,12 +162,16 @@ export default class OrbitView extends React.Component {
         if (this.props.isDarkMatterGlowEnabled !== prevProps.isDarkMatterGlowEnabled) {
             this.objects.densityRings.visible = this.props.isDarkMatterGlowEnabled;
         }
+        if (this.props.galaxyChoice !== prevProps.galaxyChoice) {
+            console.log(this.props.galaxyChoice, GALAXY_DATA[this.props.galaxyChoice].NAME);
+        }
         for (let k = 0; k < 10; k++) {
             this.densityGraphPoints[k].position.y = MAX_SLIDER_Y - (this.props.density[k] / MAX_DENSITY) * GRAPH_AXIS_HEIGHT;
         }
     }
 
     init() {
+        this.initVelocityCurveOverlay();
         this.initRedGlowRings();
         this.initBackground();
         this.initGalaxy();
@@ -263,8 +274,15 @@ export default class OrbitView extends React.Component {
             g.endFill();
             this.redGlowRings[k] = g;
             this.objects.densityRings.addChild(g);
-        }
-        
+        }   
+    }
+
+    initVelocityCurveOverlay() {
+        this.velocityCurveOverlay.sprite.x = GRAPH_AXIS_LEFT_X;
+        this.velocityCurveOverlay.sprite.y = getGraphAxisTopY(1);
+        this.velocityCurveOverlay.sprite.width = GRAPH_AXIS_WIDTH - 2 * GRAPH_GRID_SIZE;
+        this.velocityCurveOverlay.sprite.height = GRAPH_AXIS_HEIGHT;
+        this.objects.graphs.addChild(this.velocityCurveOverlay.sprite);
     }
 
     initGraphs() {
@@ -467,7 +485,7 @@ export default class OrbitView extends React.Component {
             let R = radiuses[k];
             let shell = getShellFromDot(R);
             let speed = galaxy.getOrbitalVelocityNormalized(getShellFromDot(R));
-            thetas[k] += 0.02 * speed * delta;
+            thetas[k] += 0.01 * speed * delta;
             let theta = thetas[k];
             dots[k].x = xPixels(R * Math.cos(theta));
             dots[k].y = yPixels(R * Math.sin(theta));

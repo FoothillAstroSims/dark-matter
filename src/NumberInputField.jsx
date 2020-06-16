@@ -32,7 +32,7 @@ export default class NumberInputField extends React.Component {
                     onFocus={this.handleFocus.bind(this)}
                     onBlur={this.handleBlur.bind(this)}
                     value={value}
-                    spellcheck="false"
+                    spellCheck="false"
                 />
             </form>
         );

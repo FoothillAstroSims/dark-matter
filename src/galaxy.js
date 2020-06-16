@@ -3,16 +3,16 @@
 const NUM_POINTS = 10;
 const NUM_STARS_IN_GALAXY = 200;
 
-const DM_BIN_WIDTH = 10.0;
+const DM_BIN_WIDTH = 5;
 const LIGHT_YEAR = 9.46e15;
 const MSUN = 1.989e30;
 const G = 6.67408e-11;
 const SECONDS_PER_YEAR = 3.154e7;
 
 export const MAX_DENSITY = 1e-20;
-export const MAX_VELOCITY = 1582;
+export const MAX_VELOCITY = 300;
 export const MAX_RADIUS = DM_BIN_WIDTH * NUM_POINTS;
-export const MAX_MASS_ENCLOSED = 1.783e13;
+export const MAX_MASS_ENCLOSED = 2.5e11;
 
 export const DEFAULT_DENSITY_DATA = [0.8, 0.7, 0.5, 0.2, 0.1, 0.08, 0.06, 0.04, 0.02, 0.01];
 
