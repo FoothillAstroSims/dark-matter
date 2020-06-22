@@ -13,14 +13,15 @@ function enumerate() {
  */
 export const GALAXIES = {
     NONE:                   enumerate(),
+    ALL_GALAXIES:           enumerate(),
     MILKY_WAY:              enumerate(),
-    ANDROMEDA:              enumerate(),
-    TRIANGULUM:             enumerate(),
-    SILVER_SLIVER:          enumerate(),
-    GREAT_BARRED_SPIRAL:    enumerate(),
-    BODES:                  enumerate(),
-    CIGAR:                  enumerate(),
-    SOUTHERN_PINWHEEL:      enumerate(),
+    // ANDROMEDA:              enumerate(),
+    // TRIANGULUM:             enumerate(),
+    // SILVER_SLIVER:          enumerate(),
+    // GREAT_BARRED_SPIRAL:    enumerate(),
+    // BODES:                  enumerate(),
+    // CIGAR:                  enumerate(),
+    // SOUTHERN_PINWHEEL:      enumerate(),
 };
 
 export const DEFAULT_GALAXY_KEY = GALAXIES.MILKY_WAY;
@@ -32,28 +33,31 @@ export const GALAXY_DATA = {
     },
     [GALAXIES.MILKY_WAY]: {
         NAME: "Milky Way",
-        IMG: null,
+        IMG: './img/svgs/MilkyWay.svg',
     },
-    [GALAXIES.ANDROMEDA]: {
-        NAME: "Andromeda (NGC 224)",
-    },
-    [GALAXIES.TRIANGULUM]: {
-        NAME: "Triangulum (NGC 598)",
-    },
-    [GALAXIES.SILVER_SLIVER]: {
-        NAME: "Silver Sliver (NGC 891)",
-    },
-    [GALAXIES.GREAT_BARRED_SPIRAL]: {
-        NAME: "Great Barred Spiral (NGC 1365)",
-    },
-    [GALAXIES.BODES]: {
-        NAME: "Bode's (NGC 3031)",
-    },
-    [GALAXIES.CIGAR]: {
-        NAME: "Cigar (NGC 3034)",
-    },
-    [GALAXIES.SOUTHERN_PINWHEEL]: {
-        NAME: "Southern Pinwheel (NGC 5236)",
-    },
+    [GALAXIES.ALL_GALAXIES]: {
+        NAME: "Selected Galaxies Together",
+        IMG: './img/png/allgraph.png',
+    }
+    // [GALAXIES.ANDROMEDA]: {
+    //     NAME: "Andromeda (NGC 224)",
+    // },
+    // [GALAXIES.TRIANGULUM]: {
+    //     NAME: "Triangulum (NGC 598)",
+    // },
+    // [GALAXIES.SILVER_SLIVER]: {
+    //     NAME: "Silver Sliver (NGC 891)",
+    // },
+    // [GALAXIES.GREAT_BARRED_SPIRAL]: {
+    //     NAME: "Great Barred Spiral (NGC 1365)",
+    // },
+    // [GALAXIES.BODES]: {
+    //     NAME: "Bode's (NGC 3031)",
+    // },
+    // [GALAXIES.CIGAR]: {
+    //     NAME: "Cigar (NGC 3034)",
+    // },
+    // [GALAXIES.SOUTHERN_PINWHEEL]: {
+    //     NAME: "Southern Pinwheel (NGC 5236)",
+    // },
 };
-

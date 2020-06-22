@@ -1,7 +1,7 @@
 import React from 'react';
 import Galaxy, {DEFAULT_DENSITY_DATA, MAX_DENSITY, MAX_VELOCITY, MAX_MASS_ENCLOSED} from './galaxy.js';
 import * as PIXI from 'pixi.js';
-import {GALAXIES, GALAXY_DATA} from './galaxyData.js';
+import {GALAXIES, GALAXY_DATA, DEFAULT_GALAXY_KEY} from './galaxyData.js';
 import VelocityCurveOverlay from './VelocityCurveOverlay.js'
 
 /**
@@ -112,6 +112,7 @@ export default class OrbitView extends React.Component {
             graphs: new PIXI.Graphics(),
         };
 
+        this.galaxyShellContainers = new Array(10);
 
         this.densityGraphPoints = new Array(10);
         this.velocityGraphPoints = new Array(10);
@@ -164,9 +165,15 @@ export default class OrbitView extends React.Component {
         }
         if (this.props.galaxyChoice !== prevProps.galaxyChoice) {
             console.log(this.props.galaxyChoice, GALAXY_DATA[this.props.galaxyChoice].NAME);
+            this.velocityCurveOverlay.setImageTo(this.props.galaxyChoice);
         }
+
+        /* TODO: If one of them changes, then do the following: */
         for (let k = 0; k < 10; k++) {
-            this.densityGraphPoints[k].position.y = MAX_SLIDER_Y - (this.props.density[k] / MAX_DENSITY) * GRAPH_AXIS_HEIGHT;
+            if (this.props.sliderValues[k] !== prevProps.sliderValues[k]) {
+                this.densityGraphPoints[k].position.y = MAX_SLIDER_Y - this.props.sliderValues[k] * GRAPH_AXIS_HEIGHT;
+                this.updateAllGraphRelatedStuff();
+            }
         }
     }
 
@@ -177,28 +184,18 @@ export default class OrbitView extends React.Component {
         this.initGalaxy();
         this.initGraphs();
         this.initDataPointText();
+        this.updateAllGraphRelatedStuff(); // initial update to sync data.
     }
 
     update(delta) {
         this.updateGalaxy(delta);
-        for (let i = 0; i < N_SLIDES; i++) {
-            sliderValues[i] = 1 - (this.densityGraphPoints[i].position.y - getGraphAxisTopY(0)) / GRAPH_AXIS_HEIGHT;
-        }
-        galaxy.updateData(sliderValues);
-        for (let k = 0; k < N_SLIDES; k++) {
-            this.densityGraphData[k] = galaxy.getDensity(k);
-            this.velocityGraphData[k] = galaxy.getOrbitalVelocity(k);
-            this.massGraphData[k] = galaxy.getTotalMassEnclosed(k);
-            this.velocityGraphPoints[k].y = getGraphAxisBottomY(1) - galaxy.getOrbitalVelocityNormalized(k) * GRAPH_AXIS_HEIGHT;
-            this.massGraphPoints[k].y = getGraphAxisBottomY(2) - galaxy.getTotalMassEnclosedNormalized(k) * GRAPH_AXIS_HEIGHT;
-        }
+    }
+
+    updateAllGraphRelatedStuff() {
+        galaxy.updateData(this.props.sliderValues);
+        this.updateGraphPoints();
         this.updateDataText();
         this.updateDensityRings();
-        // this.setState({
-        //     sliderValues: sliderValues,
-        //     massGraphData: this.massGraphData,
-        //     velocityGraphData: this.velocityGraphData,
-        // });
     }
 
     // ------------------------------------------------------------
@@ -243,24 +240,31 @@ export default class OrbitView extends React.Component {
     }
 
     initGalaxy() {
+        /* Create Containers for each "radius-shell" to put stars into */
+        for (let k = 0; k < 10; k++) {
+            const g = new PIXI.Container();
+            g.x = g.pivot.x = ORBIT_VIEW_SIZE / 2;
+            g.y = g.pivot.y = ORBIT_VIEW_SIZE / 2;
+            this.galaxyShellContainers[k] = g;
+            this.objects.galaxy.addChild(g);
+        }
         for (let k = 0; k < DOTS_TO_GENERATE; k++) {
             const dot = newDotGraphic();
-            let R = Math.random() * MAX_GRAPH_SIZE;
-            let theta = Math.random() * 2 * Math.PI;
-            radiuses[k] = R;
-            thetas[k] = theta;
+            const R = Math.random() * MAX_GRAPH_SIZE;
+            const theta = Math.random() * 2 * Math.PI;
             dot.x = xPixels(R * Math.cos(theta));
             dot.y = yPixels(R * Math.sin(theta));
-            this.objects.galaxy.addChild(dot)
-            dots[k] = dot;
-            // console.log(dot.x, dot.y);
+            this.galaxyShellContainers[getShellFromDot(R)].addChild(dot);
+        }
+        for (let k = 0; k < 10; k++) {
+            // this.galaxyShellContainers[k].cacheAsBitmap = true;
         }
     }
 
     initRedGlowRings() {
         {
             const g = new PIXI.Graphics();
-            g.beginFill(0xff0000, 0.7);
+            g.beginFill(0xff0000);
             g.drawCircle(ORBIT_VIEW_SIZE/2, ORBIT_VIEW_SIZE/2, ORBIT_VIEW_SIZE * 0.05);
             g.endFill();
             this.redGlowRings[0] = g;
@@ -278,9 +282,10 @@ export default class OrbitView extends React.Component {
     }
 
     initVelocityCurveOverlay() {
+        this.velocityCurveOverlay.setImageTo(this.props.galaxyChoice);
         this.velocityCurveOverlay.sprite.x = GRAPH_AXIS_LEFT_X;
         this.velocityCurveOverlay.sprite.y = getGraphAxisTopY(1);
-        this.velocityCurveOverlay.sprite.width = GRAPH_AXIS_WIDTH - 2 * GRAPH_GRID_SIZE;
+        this.velocityCurveOverlay.sprite.width = GRAPH_AXIS_WIDTH;
         this.velocityCurveOverlay.sprite.height = GRAPH_AXIS_HEIGHT;
         this.objects.graphs.addChild(this.velocityCurveOverlay.sprite);
     }
@@ -293,13 +298,6 @@ export default class OrbitView extends React.Component {
         g.x = ORBIT_VIEW_SIZE;
 
         g.lineStyle(3, 0xFFFFFF);
-
-        /* Border around the Graphs Area */
-        // g.moveTo(0,0);
-        // g.lineTo(w,0);
-        // g.lineTo(w,h);
-        // g.lineTo(0,h);
-        // g.lineTo(0,0);
 
         /* BEGIN: GRIDLINES EVERYWHERE */
         const N_GRIDS_X = Math.floor(w / GRAPH_GRID_SIZE) + 1;
@@ -361,9 +359,10 @@ export default class OrbitView extends React.Component {
         /* Graph Labels */
 
         const titleTexts = [
-            'Dark Matter Density (kg/m³)',
+            // 'Dark Matter Density (kg/m³)',
+            'Dark Matter Density (grams per Earth-volume)',
             'Orbital Velocity (km/s)',
-            'Total Mass Enclosed (Msun)'
+            'Total Mass Enclosed (Solar Masses)',
         ];
 
         for (let i = 0; i < titleTexts.length; i++) {
@@ -372,6 +371,15 @@ export default class OrbitView extends React.Component {
             // t.resolution = 2;
             t.x = 0.5 * pad;
             t.y = axisTopY(i) - pad * (i===0? 1.5 : 1);
+            g.addChild(t);
+        }
+
+        /* Special Y-axis label to point out the fact that its a log graph */
+        {
+            const t = new PIXI.Text('Log-Scale', FONT_DATA_FOR_AXES);
+            t.anchor.set(0.5);
+            t.y = ( axisTopY(0) + axisBottomY(0) ) / 2;
+            t.rotation = 3 * Math.PI / 2;
             g.addChild(t);
         }
 
@@ -388,7 +396,7 @@ export default class OrbitView extends React.Component {
         /* Add X-axis Gridline labels */
         for (let i = 0; i < 3; i++) {
             for (let k = 0; k < 10; k++) {
-                const radius = (galaxy.getRadiusPerPoint() * (k + 1)).toFixed(1);
+                const radius = (galaxy.getRadiusPerPoint() * (k + 1));
                 const t = new PIXI.Text(radius, FONT_DATA_FOR_POINTS);
                 t.anchor.set(0.5);
                 t.x = axisLeftX + 2*pad * (k+1);
@@ -402,10 +410,16 @@ export default class OrbitView extends React.Component {
             for (let k = 0; k < 6; k++) {
                 let rawVal = max_y_values[i] * (k+1) / 6;
                 let val;
-                if (i == 1) {
-                    val = Math.round(rawVal);
-                } else {
-                    val = Number.parseFloat(rawVal).toExponential(1);
+                switch(i) {
+                    case 1:
+                        val = Math.round(rawVal);
+                        break;
+                    case 0:
+                        rawVal = galaxy.logarithmic((k+1)/6);
+                        val = rawVal.toPrecision(3);
+                        break;
+                    default: 
+                        val = Number.parseFloat(rawVal).toExponential(1);
                 }
                 const t = new PIXI.Text(val, FONT_DATA_FOR_Y_AXIS_GRIDLINE_LABELS);
                 t.anchor.set(1, 0.5);
@@ -481,14 +495,19 @@ export default class OrbitView extends React.Component {
     // ------------------------------------------------------------
 
     updateGalaxy(delta) {
-        for (let k = 0; k< DOTS_TO_GENERATE; k++) {
-            let R = radiuses[k];
-            let shell = getShellFromDot(R);
-            let speed = galaxy.getOrbitalVelocityNormalized(getShellFromDot(R));
-            thetas[k] += 0.01 * speed * delta;
-            let theta = thetas[k];
-            dots[k].x = xPixels(R * Math.cos(theta));
-            dots[k].y = yPixels(R * Math.sin(theta));
+        for (let k = 0; k < 10; k++) {
+            const speed = galaxy.getOrbitalVelocityNormalized(k);
+            this.galaxyShellContainers[k].rotation -= 0.01 * speed * delta;
+        }
+    }
+
+    updateGraphPoints() {
+        for (let k = 0; k < 10; k++) {
+            this.densityGraphData[k] = galaxy.getDensity(k);
+            this.velocityGraphData[k] = galaxy.getOrbitalVelocity(k);
+            this.massGraphData[k] = galaxy.getTotalMassEnclosed(k);
+            this.velocityGraphPoints[k].y = getGraphAxisBottomY(1) - galaxy.getOrbitalVelocityNormalized(k) * GRAPH_AXIS_HEIGHT;
+            this.massGraphPoints[k].y = getGraphAxisBottomY(2) - galaxy.getTotalMassEnclosedNormalized(k) * GRAPH_AXIS_HEIGHT;
         }
     }
 
@@ -510,7 +529,7 @@ export default class OrbitView extends React.Component {
 
     updateDensityRings() {
         for (let k = 0; k < 10; k++) {
-            this.redGlowRings[k].alpha = sliderValues[k];
+            this.redGlowRings[k].alpha = 2 * this.props.density[k] / (MAX_DENSITY);
         }
     }
 
@@ -556,8 +575,8 @@ export default class OrbitView extends React.Component {
             const newPosition = this.data.getLocalPosition(this.parent);
             this.y = Math.max(Math.min(newPosition.y, MAX_SLIDER_Y), MIN_SLIDER_Y);
             let key = getSliderIndexFromPosition(this.x);
-            let val = ((MAX_SLIDER_Y - this.y) / GRAPH_AXIS_HEIGHT) * MAX_DENSITY;
-            singleton.props.onDensityChange(key, val);
+            let sliderValue = ((MAX_SLIDER_Y - this.y) / GRAPH_AXIS_HEIGHT);
+            singleton.props.onSliderChange(key, sliderValue);
         }
     }
 

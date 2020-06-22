@@ -15,7 +15,8 @@ export default class NumberInputField extends React.Component {
         if (this.state.hasFocus === true) {
             value = this.state.value
         } else {
-            value = this.props.value.toExponential(2);
+            // value = this.props.value.toExponential(2);
+            value = this.props.value.toPrecision(3);
         }
         return (
             <form
@@ -41,7 +42,7 @@ export default class NumberInputField extends React.Component {
     handleFocus() {
         this.setState({
             hasFocus: true,
-            value: this.props.value.toExponential(2)
+            value: this.props.value.toPrecision(3)
         });
     }
 
@@ -77,7 +78,6 @@ NumberInputField.propTypes = {
     sliderKey: PropTypes.number,
     min: PropTypes.number,
     max: PropTypes.number,
-    step: PropTypes.number,
     value: PropTypes.number,
     onChange: PropTypes.func,
 }
