@@ -529,7 +529,7 @@ export default class OrbitView extends React.Component {
 
     updateDensityRings() {
         for (let k = 0; k < 10; k++) {
-            this.redGlowRings[k].alpha = 2 * this.props.density[k] / (MAX_DENSITY);
+            this.redGlowRings[k].alpha = this.props.sliderValues[k];
         }
     }
 
