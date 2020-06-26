@@ -360,7 +360,7 @@ export default class OrbitView extends React.Component {
 
         const titleTexts = [
             // 'Dark Matter Density (kg/m³)',
-            'Dark Matter Density (grams per Earth-volume)',
+            'Dark Matter Density (kilograms per Earth-volume)',
             'Orbital Velocity (km/s)',
             'Total Mass Enclosed (Solar Masses)',
         ];

@@ -36,7 +36,7 @@ export default class Controls extends React.Component {
                     onChange={this.onChange.bind(this)} 
                 />
                 <div id="darkMatterGlow-label">
-                    Show Dark Matter Glow
+                    Show Dark Matter
                 </div>
             </div>
             <div id="densityInputBox-container">

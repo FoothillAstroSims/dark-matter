@@ -10,6 +10,14 @@ export default class NumberInputField extends React.Component {
         };
     }
 
+    componentDidUpdate(prevProps) {
+        if (this.props.value !== prevProps.value) {
+            this.setState({ 
+                value: this.props.value.toPrecision(3)
+            });
+        }
+    }
+
     render() {
         let value;
         if (this.state.hasFocus === true) {
@@ -22,13 +30,14 @@ export default class NumberInputField extends React.Component {
             <form
                 onSubmit={this.handleSubmit.bind(this)}
                 style={{display: "inline-block"}}
+                noValidate={true}
                 >
                 <input
                     type="number"
                     name="numberInputBox"
                     className="densityInputBox"
-                    min={this.props.min}
-                    max={this.props.max}
+                    // min={this.props.min}
+                    // max={this.props.max}
                     onChange={this.handleChange.bind(this)}
                     onFocus={this.handleFocus.bind(this)}
                     onBlur={this.handleBlur.bind(this)}
@@ -66,6 +75,7 @@ export default class NumberInputField extends React.Component {
             return;
         }
         value = Number.parseFloat(value);
+        value = Math.min(Math.max(value, this.props.min), this.props.max);
         this.props.onChange(this.props.sliderKey, value);
     }
 
