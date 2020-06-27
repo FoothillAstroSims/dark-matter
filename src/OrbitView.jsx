@@ -1,6 +1,6 @@
 import React from 'react';
 import Galaxy, {DEFAULT_DENSITY_DATA, MAX_DENSITY, MAX_VELOCITY, MAX_MASS_ENCLOSED} from './galaxy.js';
-import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js-legacy';
 import {GALAXIES, GALAXY_DATA, DEFAULT_GALAXY_KEY} from './galaxyData.js';
 import VelocityCurveOverlay from './VelocityCurveOverlay.js'
 
@@ -415,7 +415,7 @@ export default class OrbitView extends React.Component {
                         val = Math.round(rawVal);
                         break;
                     case 0:
-                        rawVal = galaxy.logarithmic((k+1)/6);
+                        rawVal = Galaxy.sliderValueToDensity((k+1)/6);
                         val = rawVal.toPrecision(3);
                         break;
                     default: 
