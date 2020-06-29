@@ -148,25 +148,40 @@
         background: radial-gradient( black, darkcyan);
     }
 
-    .floatingArticleWrapper {
-        position: absolute;
-        /* right: 100px; */
+
+    /* Floating Article Pop-ups */
+
+    #floatingArticleWrapper {
+        position: fixed;
         top: 0;
-        width: 1467px;
-        height: 800px;
-        background: rgba(0, 0, 0, 0.75);
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:  rgba(0, 0, 0, 0.75);
+        display: none;
+    }
+
+    .floatingArticle,
+    .articlePositioner {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
         display: none;
     }
 
     .floatingArticle {
         overflow-y: auto;
-        margin: 50px auto;
+        margin: 5% auto;
         text-align: justify;
         font-size: 24px;
         padding: 0px 100px;
         line-height: 1.25em;
+        max-width: 90%;
         width: 800px;
-        height: 700px;
+        /* height: 700px; */
+        /* height: 75%; */
         background: #121212;
         color: white;
         border: 1px solid darkcyan;
@@ -189,8 +204,10 @@
     </div>
     <div id="wrapper">
         <div id="sim-root"></div>
-        <div id="article1" class="floatingArticleWrapper">
-            <div class="floatingArticle">
+
+        <div class="articlePositioner">
+            <div id="floatingArticleWrapper"></div>
+            <div id="article1" class="floatingArticle">
                 <h2 id="mass-and-orbits">MASS AND ORBITS</h2>
                 <p>In our Solar system, planets orbit around the sun. The further away from the sun a planet is, the slower it’s orbital velocity: a relationship described by Kepler’s Law. From the laws of gravity, The total mass enclosed by an object’s orbit determines how fast that object orbits around. If you know one, then you can calculate the other.</p>
                 <figure>
@@ -225,11 +242,9 @@
                 <p>Rubin, Vera C.; Ford, W. Kent, Jr. (1970). “Rotation of the Andromeda Nebula from a Spectroscopic Survey of Emission Regions”. <em>Astrophysical Journal</em>. 159: 379. https://www.doi.org/10.1086/150317.</p>
                 <p>Rubin, Vera C. (1983). “Dark Matter in Spiral Galaxies.” <em>Scientific American</em>. 248, no. 6 : 96-109.</p>
                 <p>Y. Sofue, Y. Tutui, M. Honma, A. Tomita, T. Takamiya, J. Koda and Y. Takeda. (1999). “Central Rotation Curves of Spiral Galaxies”. <em>The Astrophysical Journal</em>. 523: 136-146.</p>
-            </div>    
-        </div>
+            </div>
 
-        <div id="article2" class="floatingArticleWrapper">
-            <div class="floatingArticle">
+            <div id="article2" class="floatingArticle">
                 <h2 id="about-the-simulation">ABOUT THE SIMULATION</h2>
                 <p>This Simulation tries to capture that connection between dark matter and the orbital velocity of stars. Adjusting the density of matter in a region of space will affect how fast the stars move around the center of the galaxy. You can see a plot of the Total Mass Enclosed for each region, which in turn is used to calculate the Orbital Velocity for a star in that region.</p>
                 <p>The Dark Matter Density plot contains a set of sliders to adjust the quantity. Values can also be manually typed using the number input boxes.</p>
@@ -245,29 +260,43 @@
     </div>
 
     <script>
+        var articleWrapper = document.querySelector("#floatingArticleWrapper");
+        var articlePositioner = document.querySelector(".articlePositioner");
         var article1 = document.querySelector("#article1");
         var article2 = document.querySelector("#article2");
+
         article1.style.display = "none";
         article2.style.display = "none";
+        articleWrapper.style.display = "none";
+
+        function show(e) {
+            e.style.display = "block";
+        }
+
+        function hide(e) {
+            e.style.display = "none";
+        }
 
         function showArticle1() {
-            article2.style.display = "none";
-            if (article1.style.display === "none") {
-                article1.style.display = "block";
-            } else {
-                article1.style.display = "none";
-            }
+            show(articleWrapper);
+            show(articlePositioner);
+            show(article1);
         }
 
         function showArticle2() {
-            article1.style.display = "none";
-            if (article2.style.display === "none") {
-                article2.style.display = "block";
-            } else {
-                article2.style.display = "none";
-            }
+            show(articleWrapper);
+            show(articlePositioner);
+            show(article2);
         }
 
+        function hideArticles() {
+            hide(articleWrapper);
+            hide(articlePositioner);
+            hide(article1);
+            hide(article2);
+        }
+
+        articleWrapper.addEventListener("click", hideArticles);
         document.querySelector("#nav_whatis").addEventListener("click", showArticle1);
         document.querySelector("#nav_instructions").addEventListener("click", showArticle2);
     </script>
