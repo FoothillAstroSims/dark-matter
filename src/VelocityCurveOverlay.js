@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js-legacy';
-import {GALAXIES, GALAXY_DATA} from './galaxyData.js';
+import {GALAXY_DATA, DEFAULT_GALAXY_KEY} from './galaxyData.js';
+import { MAX_VELOCITY } from './galaxy.js';
 
 
 /**
@@ -22,7 +23,9 @@ const TEXTURES = Object.fromEntries(
  */
 export default class VelocityCurveOverlay {
     constructor() {
-        this.sprite = new PIXI.Sprite(TEXTURES[GALAXIES.MILKY_WAY]);
+        this._currentKey = DEFAULT_GALAXY_KEY;
+        this.sprite = new PIXI.Sprite(PIXI.Texture.EMPTY);
+        this.setImageTo(DEFAULT_GALAXY_KEY);
     }
 
     getPixiObject() {
@@ -30,8 +33,11 @@ export default class VelocityCurveOverlay {
     }
 
     setImageTo(galaxyKey) {
+        this._currentKey = galaxyKey;
         this.sprite.texture = TEXTURES[galaxyKey];
+        console.log(`sprite scale`, this.sprite.scale);
     }
+
 }
 
 /**
@@ -40,8 +46,10 @@ export default class VelocityCurveOverlay {
  * to enable the existence of a "no galaxy overlay" option in the simulation.
  */
 function makeTexture(imagePath) {
-    if (imagePath === null) {
-        return PIXI.Texture.EMPTY;
+    let texture = PIXI.Texture.EMPTY;
+    if (imagePath !== null) {
+        texture = PIXI.Texture.from(imagePath);
     }
-    return PIXI.Texture.from(imagePath);
+    texture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+    return texture;
 }

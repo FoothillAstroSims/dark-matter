@@ -127,6 +127,8 @@ export default class OrbitView extends React.Component {
         this.massDataText = new Array(10);
 
         this.redGlowRings = new Array(10);
+
+        this.yAxisLabelText = new Array(3);
     }
 
     componentDidMount() {
@@ -166,6 +168,7 @@ export default class OrbitView extends React.Component {
         if (this.props.galaxyChoice !== prevProps.galaxyChoice) {
             console.log(this.props.galaxyChoice, GALAXY_DATA[this.props.galaxyChoice].NAME);
             this.velocityCurveOverlay.setImageTo(this.props.galaxyChoice);
+            this.updateVelocityCurveOverlay();
         }
 
         /* TODO: If one of them changes, then do the following: */
@@ -196,6 +199,7 @@ export default class OrbitView extends React.Component {
         this.updateGraphPoints();
         this.updateDataText();
         this.updateDensityRings();
+        this.updateVelocityCurveOverlay();
     }
 
     // ------------------------------------------------------------
@@ -407,6 +411,7 @@ export default class OrbitView extends React.Component {
         /* Add Y-axis Gridline labels */
         let max_y_values = [MAX_DENSITY, MAX_VELOCITY, MAX_MASS_ENCLOSED];
         for (let i = 0; i < 3; i++) {
+            this.yAxisLabelText[i] = new Array(6);
             for (let k = 0; k < 6; k++) {
                 let rawVal = max_y_values[i] * (k+1) / 6;
                 let val;
@@ -426,6 +431,7 @@ export default class OrbitView extends React.Component {
                 t.x = axisLeftX - 5;
                 t.y = axisBottomY(i) - (k+1) * pad;
                 g.addChild(t);
+                this.yAxisLabelText[i][k] = t;
             }
         }
 
@@ -524,7 +530,35 @@ export default class OrbitView extends React.Component {
                     textArrays[i][k].text = Number.parseFloat(dataArrays[i][k]).toExponential(1);
                 }
             }
-        }        
+        }
+        /* Update y-axis gridline label text */
+        let max_y_values = [MAX_DENSITY, MAX_VELOCITY, MAX_MASS_ENCLOSED];
+        for (let i = 0; i < 3; i++) {
+            for (let k = 0; k < 6; k++) {
+                let rawVal = max_y_values[i] * (k+1) / 6;
+                let val;
+                switch(i) {
+                    case 1:
+                        val = Math.round(rawVal);
+                        break;
+                    case 0:
+                        rawVal = Galaxy.sliderValueToDensity((k+1)/6);
+                        val = rawVal.toPrecision(3);
+                        break;
+                    default: 
+                        val = Number.parseFloat(rawVal).toExponential(1);
+                }
+                this.yAxisLabelText[i][k].text = val;
+            }
+        }
+    }
+
+    updateVelocityCurveOverlay() {
+        let scaleY = GALAXY_DATA[this.props.galaxyChoice].MAX_V / MAX_VELOCITY;
+        console.log("new scale factor:", scaleY);
+        // this.velocityCurveOverlay.sprite.scale.set(1, scaleY);
+        this.velocityCurveOverlay.sprite.height = GRAPH_AXIS_HEIGHT * scaleY;
+        this.velocityCurveOverlay.sprite.y = getGraphAxisBottomY(1) - this.velocityCurveOverlay.sprite.height;
     }
 
     updateDensityRings() {

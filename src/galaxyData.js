@@ -34,10 +34,14 @@ export const GALAXY_DATA = {
     [GALAXIES.MILKY_WAY]: {
         NAME: "Milky Way",
         IMG: './img/svgs/MilkyWay.svg',
+        MAX_V: 300,
+        MAX_R: 60,
     },
     [GALAXIES.ALL_GALAXIES]: {
         NAME: "Selected Galaxies Together",
         IMG: './img/png/allgraph.png',
+        MAX_V: 400,
+        MAX_R: 100,
     }
     // [GALAXIES.ANDROMEDA]: {
     //     NAME: "Andromeda (NGC 224)",
