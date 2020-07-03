@@ -14,7 +14,7 @@ export default class GalaxySelectionMenu extends React.Component {
     }
 
     handleChange(event) {
-        this.props.onChange(event.target.value);
+        this.props.onChange(Number.parseInt(event.target.value));
     }
 
     render() {

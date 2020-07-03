@@ -166,12 +166,12 @@ export default class OrbitView extends React.Component {
             this.objects.densityRings.visible = this.props.isDarkMatterGlowEnabled;
         }
         if (this.props.galaxyChoice !== prevProps.galaxyChoice) {
-            console.log(this.props.galaxyChoice, GALAXY_DATA[this.props.galaxyChoice].NAME);
+            // console.log(this.props.galaxyChoice, GALAXY_DATA[this.props.galaxyChoice].NAME);
             this.velocityCurveOverlay.setImageTo(this.props.galaxyChoice);
             this.updateVelocityCurveOverlay();
         }
 
-        /* TODO: If one of them changes, then do the following: */
+        /* If one of the slider values has changed, then update graphics */
         for (let k = 0; k < 10; k++) {
             if (this.props.sliderValues[k] !== prevProps.sliderValues[k]) {
                 this.densityGraphPoints[k].position.y = MAX_SLIDER_Y - this.props.sliderValues[k] * GRAPH_AXIS_HEIGHT;
@@ -292,6 +292,14 @@ export default class OrbitView extends React.Component {
         this.velocityCurveOverlay.sprite.width = GRAPH_AXIS_WIDTH;
         this.velocityCurveOverlay.sprite.height = GRAPH_AXIS_HEIGHT;
         this.objects.graphs.addChild(this.velocityCurveOverlay.sprite);
+        const mask = new PIXI.Graphics();
+        mask.beginFill(0x00ff00, 0.5);
+        mask.drawRect(0, 0, GRAPH_AXIS_WIDTH, GRAPH_AXIS_HEIGHT);
+        mask.endFill();
+        mask.x = GRAPH_AXIS_LEFT_X;
+        mask.y = getGraphAxisTopY(1);
+        this.velocityCurveOverlay.sprite.mask = mask;
+        this.objects.graphs.addChild(mask);
     }
 
     initGraphs() {
@@ -555,8 +563,6 @@ export default class OrbitView extends React.Component {
 
     updateVelocityCurveOverlay() {
         let scaleY = GALAXY_DATA[this.props.galaxyChoice].MAX_V / MAX_VELOCITY;
-        console.log("new scale factor:", scaleY);
-        // this.velocityCurveOverlay.sprite.scale.set(1, scaleY);
         this.velocityCurveOverlay.sprite.height = GRAPH_AXIS_HEIGHT * scaleY;
         this.velocityCurveOverlay.sprite.y = getGraphAxisBottomY(1) - this.velocityCurveOverlay.sprite.height;
     }

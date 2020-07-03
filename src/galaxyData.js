@@ -28,7 +28,7 @@ export const DEFAULT_GALAXY_KEY = GALAXIES.MILKY_WAY;
 
 export const GALAXY_DATA = {
     [GALAXIES.NONE]: {
-        NAME: "Choose a Galaxy!",
+        NAME: "[No Galaxy Selected]",
         IMG: null,
     },
     [GALAXIES.MILKY_WAY]: {
@@ -40,7 +40,7 @@ export const GALAXY_DATA = {
     [GALAXIES.ALL_GALAXIES]: {
         NAME: "Selected Galaxies Together",
         IMG: './img/png/allgraph.png',
-        MAX_V: 400,
+        MAX_V: 800,
         MAX_R: 100,
     }
     // [GALAXIES.ANDROMEDA]: {

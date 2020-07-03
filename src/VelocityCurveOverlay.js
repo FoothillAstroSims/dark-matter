@@ -35,9 +35,7 @@ export default class VelocityCurveOverlay {
     setImageTo(galaxyKey) {
         this._currentKey = galaxyKey;
         this.sprite.texture = TEXTURES[galaxyKey];
-        console.log(`sprite scale`, this.sprite.scale);
     }
-
 }
 
 /**

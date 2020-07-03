@@ -53,7 +53,6 @@ export default class Controls extends React.Component {
     }
 
     onChange(key, value) {
-        // console.log(`key=${key}, value=${value}`);
         this.props.onDensityChange(key, value);
     }
 
