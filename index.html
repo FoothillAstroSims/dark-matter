@@ -134,6 +134,7 @@
     }
     .nav_button {
         all: unset;
+        background: black;
         border-radius: 4px;
         color: lightcyan;
         border: 2px outset darkcyan;
@@ -146,6 +147,8 @@
         user-select: none;
     }
     .nav_button:hover {
+        background: darkcyan;
+        color: white;
         cursor: pointer;
         text-decoration: underline;
     }
@@ -160,7 +163,7 @@
 
     /* Article Pages */
 
-    #floatingArticleWrapper {
+    #article_faded_background {
         position: fixed;
         top: 0;
         left: 0;
@@ -182,18 +185,37 @@
 
     .floatingArticle {
         overflow-y: auto;
-        margin: 25px auto;
+        border: 1px solid darkcyan;
+        box-shadow: inset 0 0 20px 2px darkcyan;
+        color: white;
+    }
+
+    header {
+        border-bottom: solid 1px white;
+        text-align: center;
+    }
+    .articleCloser {
+        position: absolute;
+        top: 20px;
+        height: 2em;
+        width: 50px;
+        text-align: center;
+        right: 50px;
+        z-index: 1;
+    }
+    article > h2 {
+        margin-top: 1.5em;
+    }
+
+    .article_content {
+        background: #121212;
+        margin: 20px auto;
+        padding: 0 1em 1em 1em;
+        width: 800px;
+        border: 1px solid #333;
         text-align: justify;
         font-size: 24px;
         line-height: 1.5;
-        padding: 0px 100px;
-        width: min(800px, 95%);
-        /* height: 700px; */
-        /* height: 75%; */
-        background: #121212;
-        color: white;
-        border: 1px solid darkcyan;
-        box-shadow: 0 0 20px 2px darkcyan;
     }
 
     .ref_section {
@@ -203,8 +225,6 @@
     }
 
     figure {
-        line-height: 1.25;
-        font-size: 22px;
         text-align: center;
     }
 
@@ -232,68 +252,80 @@
         <div id="sim-root"></div>
 
         <div class="articlePositioner">
-            <div id="floatingArticleWrapper"></div>
+            <div id="article_faded_background"></div>
+            <button class="articleCloser nav_button">X</button>
             <div id="article1" class="floatingArticle">
-                <h2 id="mass-and-orbits">MASS AND ORBITS</h2>
-                <p>In our Solar system, planets orbit around the sun. The further away from the sun a planet is, the slower it’s orbital velocity: a relationship described by Kepler’s Law. From the laws of gravity, The total mass enclosed by an object’s orbit determines how fast that object orbits around. If you know one, then you can calculate the other.</p>
-                <figure>
-                <img src="img/figures/planets.png" alt="Orbital Velocity versus Radius for the Solar System. The Relationship is described by Kepler’s Law. The Orbital Velocity distinctly decreases as you move further the center. (Rubin 1983)"  /><figcaption>Orbital Velocity versus Radius for the Solar System. The Relationship is described by Kepler’s Law. The Orbital Velocity distinctly decreases as you move further the center. (Rubin 1983)</figcaption>
-                </figure>
-                <figure>
-                <img src="img/figures/mass_vel.png" alt="Knowledge of either the Enclosed Mass or the Orbital Velocity can allow you to determine the other."  /><figcaption>Knowledge of either the Enclosed Mass or the Orbital Velocity can allow you to determine the other.</figcaption>
-                </figure>
-                <h2 id="mass-and-luminosity">MASS AND LUMINOSITY</h2>
-                <p>How do we find mass in the universe? The assumption has been that luminous regions of space must contain matter (like a star, for example), and therefore mass. For a long time, astronomers have assumed that more luminosity implied more mass. However, it was not confirmed, and it prompted astronomers to take a closer look.</p>
-                <figure>
-                <img src="img/figures/lum_to_mass.png" alt="The Question: Can Luminosity be used to determine mass?"  /><figcaption>The Question: Can Luminosity be used to determine mass?</figcaption>
-                </figure>
-                <h2 id="spiral-galaxies">SPIRAL GALAXIES</h2>
-                <p>In order to better understand the relationship between luminosity and mass, astronomers such as Vera Rubin started looking at the orbital velocities of stars in spiral galaxies. (Rubin 1983). The orbital velocities of galaxies at different distances from the center was recorded and could be used to calculate the enclosed mass. During these investigations, an unexpected and astounding discovery was made: stars were orbiting much more quickly than expected.</p>
-                <figure>
-                <img src="img/figures/andromeda_milkyway.png" alt="Orbital Velocity Curves for Andromeda and The Milky Way (Sofue 1999)" /><figcaption>Orbital Velocity Curves for Andromeda and The Milky Way (Sofue 1999)</figcaption>
-                </figure>
-                <h2 id="dark-matter">DARK MATTER</h2>
-                <p>In most spiral galaxies, the center of the galaxy is the most luminous. The expectation was that most mass would be found at the center, and that stars would orbit around the center similar to the Solar System, following Kepler’s Laws. However, nearly all velocity curves were observed to rise quickly and remain flat or even slowly increase further out from the center.</p>
-                <p>There wasn’t enough luminous mass to explain these velocities. So, it was hypothesized that there must be non-luminous mass found in these galaxies, named <em>Dark Matter</em>.</p>
-                <figure>
-                <img src="img/figures/triple.png" alt="Comparison of Luminosity, Mass Enclosed, and Orbital Velocity (Rubin 1983). The dotted lines show what galaxy curves were expected to look like. The solid lines show what observations actually reveal." /><figcaption>Comparison of Luminosity, Mass Enclosed, and Orbital Velocity (Rubin 1983). The dotted lines show what galaxy curves were expected to look like. The solid lines show what observations actually reveal.</figcaption>
-                </figure>
-                <h2 id="other-resources">OTHER RESOURCES</h2>
-                <div class="ref_section">
-                    <p>Homepage of Yoshiaki Sofue, who has links to papers and information about the galatic dynamics of dark matter: http://www.ioa.s.u-tokyo.ac.jp/~sofue/</p>
-                    <p>Dataset of existing galaxy rotation curves used in the simulation, created by Yoshiaki Sofue: http://www.ioa.s.u-tokyo.ac.jp/~sofue/RC99/alldata.tar.gz</p>
-                    <p>Astrobites article about Vera Rubin and her contribution to the discovery of Dark Matter: https://astrobites.org/2016/12/27/how-one-person-discovered-the-majority-of-the-universe-the-work-of-vera-rubin/</p>
-                    <p>Vera Cooper Rubin (1928–2016): https://www.jstor.org/stable/10.2307/26660082</p>
-                </div>
-                <h2 id="references">REFERENCES</h2>
-                <div class="ref_section">
-                    <p>Rubin, V.; Thonnard, W.K. Jr.; Ford, N. (1980). “Rotational Properties of 21 Sc Galaxies with a Large Range of Luminosities and Radii from NGC 4605 (R = 4kpc) to UGC 2885 (R = 122kpc)”. <em>The Astrophysical Journal</em>. 238: 471. Bibcode:1980ApJ…238..471R. https://www.doi.org/10.1086/158003.</p>
-                    <p>Rubin, Vera C.; Ford, W. Kent, Jr. (1970). “Rotation of the Andromeda Nebula from a Spectroscopic Survey of Emission Regions”. <em>Astrophysical Journal</em>. 159: 379. https://www.doi.org/10.1086/150317.</p>
-                    <p>Rubin, Vera C. (1983). “Dark Matter in Spiral Galaxies.” <em>Scientific American</em>. 248, no. 6 : 96-109.</p>
-                    <p>Y. Sofue, Y. Tutui, M. Honma, A. Tomita, T. Takamiya, J. Koda and Y. Takeda. (1999). “Central Rotation Curves of Spiral Galaxies”. <em>The Astrophysical Journal</em>. 523: 136-146.</p>
-                </div>
+                <article class="article_content">
+                    <header>
+                        <h1>What is Dark Matter?</h1>
+                    </header>
+                    <h2 id="mass-and-orbits">MASS AND ORBITS</h2>
+                    <p>In our Solar system, planets orbit around the sun. The further away from the sun a planet is, the slower it’s orbital velocity: a relationship described by Kepler’s Law. From the laws of gravity, The total mass enclosed by an object’s orbit determines how fast that object orbits around. If you know one, then you can calculate the other.</p>
+                    <figure>
+                    <img src="img/figures/planets.png" alt="Orbital Velocity versus Radius for the Solar System. The Relationship is described by Kepler’s Law. The Orbital Velocity distinctly decreases as you move further the center. (Rubin 1983)"  /><figcaption>Orbital Velocity versus Radius for the Solar System. The Relationship is described by Kepler’s Law. The Orbital Velocity distinctly decreases as you move further the center. (Rubin 1983)</figcaption>
+                    </figure>
+                    <figure>
+                    <img src="img/figures/mass_vel.png" alt="Knowledge of either the Enclosed Mass or the Orbital Velocity can allow you to determine the other."  /><figcaption>Knowledge of either the Enclosed Mass or the Orbital Velocity can allow you to determine the other.</figcaption>
+                    </figure>
+                    <h2 id="mass-and-luminosity">MASS AND LUMINOSITY</h2>
+                    <p>How do we find mass in the universe? The assumption has been that luminous regions of space must contain matter (like a star, for example), and therefore mass. For a long time, astronomers have assumed that more luminosity implied more mass. However, it was not confirmed, and it prompted astronomers to take a closer look.</p>
+                    <figure>
+                    <img src="img/figures/lum_to_mass.png" alt="The Question: Can Luminosity be used to determine mass?"  /><figcaption>The Question: Can Luminosity be used to determine mass?</figcaption>
+                    </figure>
+                    <h2 id="spiral-galaxies">SPIRAL GALAXIES</h2>
+                    <p>In order to better understand the relationship between luminosity and mass, astronomers such as Vera Rubin started looking at the orbital velocities of stars in spiral galaxies. (Rubin 1983). The orbital velocities of galaxies at different distances from the center was recorded and could be used to calculate the enclosed mass. During these investigations, an unexpected and astounding discovery was made: stars were orbiting much more quickly than expected.</p>
+                    <figure>
+                    <img src="img/figures/andromeda_milkyway.png" alt="Orbital Velocity Curves for Andromeda and The Milky Way (Sofue 1999)" /><figcaption>Orbital Velocity Curves for Andromeda and The Milky Way (Sofue 1999)</figcaption>
+                    </figure>
+                    <h2 id="dark-matter">DARK MATTER</h2>
+                    <p>In most spiral galaxies, the center of the galaxy is the most luminous. The expectation was that most mass would be found at the center, and that stars would orbit around the center similar to the Solar System, following Kepler’s Laws. However, nearly all velocity curves were observed to rise quickly and remain flat or even slowly increase further out from the center.</p>
+                    <p>There wasn’t enough luminous mass to explain these velocities. So, it was hypothesized that there must be non-luminous mass found in these galaxies, named <em>Dark Matter</em>.</p>
+                    <figure>
+                    <img src="img/figures/triple.png" alt="Comparison of Luminosity, Mass Enclosed, and Orbital Velocity (Rubin 1983). The dotted lines show what galaxy curves were expected to look like. The solid lines show what observations actually reveal." /><figcaption>Comparison of Luminosity, Mass Enclosed, and Orbital Velocity (Rubin 1983). The dotted lines show what galaxy curves were expected to look like. The solid lines show what observations actually reveal.</figcaption>
+                    </figure>
+                    <h2 id="other-resources">OTHER RESOURCES</h2>
+                    <div class="ref_section">
+                        <p>Homepage of Yoshiaki Sofue, who has links to papers and information about the galatic dynamics of dark matter: http://www.ioa.s.u-tokyo.ac.jp/~sofue/</p>
+                        <p>Dataset of existing galaxy rotation curves used in the simulation, created by Yoshiaki Sofue: http://www.ioa.s.u-tokyo.ac.jp/~sofue/RC99/alldata.tar.gz</p>
+                        <p>Astrobites article about Vera Rubin and her contribution to the discovery of Dark Matter: https://astrobites.org/2016/12/27/how-one-person-discovered-the-majority-of-the-universe-the-work-of-vera-rubin/</p>
+                        <p>Vera Cooper Rubin (1928–2016): https://www.jstor.org/stable/10.2307/26660082</p>
+                    </div>
+                    <h2 id="references">REFERENCES</h2>
+                    <div class="ref_section">
+                        <p>Rubin, V.; Thonnard, W.K. Jr.; Ford, N. (1980). “Rotational Properties of 21 Sc Galaxies with a Large Range of Luminosities and Radii from NGC 4605 (R = 4kpc) to UGC 2885 (R = 122kpc)”. <em>The Astrophysical Journal</em>. 238: 471. Bibcode:1980ApJ…238..471R. https://www.doi.org/10.1086/158003.</p>
+                        <p>Rubin, Vera C.; Ford, W. Kent, Jr. (1970). “Rotation of the Andromeda Nebula from a Spectroscopic Survey of Emission Regions”. <em>Astrophysical Journal</em>. 159: 379. https://www.doi.org/10.1086/150317.</p>
+                        <p>Rubin, Vera C. (1983). “Dark Matter in Spiral Galaxies.” <em>Scientific American</em>. 248, no. 6 : 96-109.</p>
+                        <p>Y. Sofue, Y. Tutui, M. Honma, A. Tomita, T. Takamiya, J. Koda and Y. Takeda. (1999). “Central Rotation Curves of Spiral Galaxies”. <em>The Astrophysical Journal</em>. 523: 136-146.</p>
+                    </div>
+                </article>
             </div>
 
             <div id="article2" class="floatingArticle">
-                <h2 id="about-the-simulation">ABOUT THE SIMULATION</h2>
-                <p>This Simulation tries to capture that connection between dark matter and the orbital velocity of stars. Adjusting the density of matter in a region of space will affect how fast the stars move around the center of the galaxy. You can see a plot of the Total Mass Enclosed for each region, which in turn is used to calculate the Orbital Velocity for a star in that region.</p>
-                <p>The Dark Matter Density plot contains a set of sliders to adjust the quantity. Values can also be manually typed using the number input boxes.</p>
-                <p>The Orbital Velocity plot has a drop-down menu, which can be used to select and display data from observations of real galaxies.</p>
-                <h2 id="example-usage-milky-way">EXAMPLE USAGE: MILKY WAY</h2>
-                <p>Start by selecting the Milky Way galaxy from the drop-down menu in the Orbital Velocity graph. Adjust the Dark Matter Density, noticing the effect it has on the Orbital Velocity. See if you can make the red points in the Orbital Velocity match up the plotted curve from the real galaxy. Once they match, take note of the values of Dark Matter Density. The Earth is located about 25,000 light years from the center of the Milky Way, check the density graph at that radius to find out how much dark matter might be on Earth!</p>
-                <h2 id="example-usage-keplers-law">EXAMPLE USAGE: KEPLER’S LAW</h2>
-                <p>Set the first slider to maximum, and all of the other sliders to zero. This now loosely resembles our solar system, where the high density of mass at the center could be thought of as the Sun. Notice the pattern of how the orbital decreases as you get further away from the center, in accordance with Kepler’s Law. This pattern was the original expectation of how orbital velocities in galaxies should work. However, our observations show otherwise.</p>
-                <h2 id="things-to-notice">THINGS TO NOTICE</h2>
-                <p>A discovery that you might find is that the Mass Enclosed graph tends to keep increasing. This is notable because it was previously thought that Mass Enclosed would flatten as you go further out from the center of the galaxy. However, in order to make the Orbital Velocity match our observations, this increasing mass is necessary.</p>
+                <article class="article_content">
+                    <header>
+                        <h1>Simulation Instructions</h1>
+                    </header>
+                    <h2 id="about-the-simulation">ABOUT THE SIMULATION</h2>
+                    <p>This Simulation tries to capture that connection between dark matter and the orbital velocity of stars. Adjusting the density of matter in a region of space will affect how fast the stars move around the center of the galaxy. You can see a plot of the Total Mass Enclosed for each region, which in turn is used to calculate the Orbital Velocity for a star in that region.</p>
+                    <p>The Dark Matter Density plot contains a set of sliders to adjust the quantity. Values can also be manually typed using the number input boxes.</p>
+                    <p>The Orbital Velocity plot has a drop-down menu, which can be used to select and display data from observations of real galaxies.</p>
+                    <h2 id="example-usage-milky-way">EXAMPLE USAGE: MILKY WAY</h2>
+                    <p>Start by selecting the Milky Way galaxy from the drop-down menu in the Orbital Velocity graph. Adjust the Dark Matter Density, noticing the effect it has on the Orbital Velocity. See if you can make the red points in the Orbital Velocity match up the plotted curve from the real galaxy. Once they match, take note of the values of Dark Matter Density. The Earth is located about 25,000 light years from the center of the Milky Way, check the density graph at that radius to find out how much dark matter might be on Earth!</p>
+                    <h2 id="example-usage-keplers-law">EXAMPLE USAGE: KEPLER’S LAW</h2>
+                    <p>Set the first slider to maximum, and all of the other sliders to zero. This now loosely resembles our solar system, where the high density of mass at the center could be thought of as the Sun. Notice the pattern of how the orbital decreases as you get further away from the center, in accordance with Kepler’s Law. This pattern was the original expectation of how orbital velocities in galaxies should work. However, our observations show otherwise.</p>
+                    <h2 id="things-to-notice">THINGS TO NOTICE</h2>
+                    <p>A discovery that you might find is that the Mass Enclosed graph tends to keep increasing. This is notable because it was previously thought that Mass Enclosed would flatten as you go further out from the center of the galaxy. However, in order to make the Orbital Velocity match our observations, this increasing mass is necessary.</p>
+                </article>
             </div>
         </div>
     </div>
 
     <script>
-        var articleWrapper = document.querySelector("#floatingArticleWrapper");
+        var articleWrapper = document.querySelector("#article_faded_background");
         var articlePositioner = document.querySelector(".articlePositioner");
         var article1 = document.querySelector("#article1");
         var article2 = document.querySelector("#article2");
+        var closers = document.querySelectorAll(".articleCloser");
 
         article1.style.display = "none";
         article2.style.display = "none";
@@ -308,7 +340,8 @@
         }
 
         function showArticle1(event) {
-            // event.target.blur();
+            hideArticles()
+            event.target.blur();
             show(articleWrapper);
             show(articlePositioner);
             show(article1);
@@ -317,6 +350,7 @@
         }
 
         function showArticle2(event) {
+            hideArticles()
             // event.target.blur();
             show(articleWrapper);
             show(articlePositioner);
@@ -335,6 +369,18 @@
         articleWrapper.addEventListener("click", hideArticles);
         document.querySelector("#nav_whatis").addEventListener("click", showArticle1);
         document.querySelector("#nav_instructions").addEventListener("click", showArticle2);
+        for (let e of closers) {
+            e.addEventListener("click", hideArticles);
+        }
+
+        // let articles = document.querySelectorAll("article");
+        // for (let art of articles) {
+        //     let figCaptions = art.querySelectorAll("figcaption");
+        //     for (let k = 0; k < figCaptions.length; k++) {
+        //         let figcap = figCaptions[k];
+        //         figcap.innerHTML = `<b>Figure ${k+1}: </b>` + figcap.innerHTML;
+        //     }
+        // }
     </script>
     <script src="dist/bundle.js"></script>
 </body>
