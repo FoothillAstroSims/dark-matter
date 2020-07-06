@@ -1,53 +1,91 @@
 import * as PIXI from 'pixi.js-legacy';
-import {GALAXY_DATA, DEFAULT_GALAXY_KEY} from './galaxyData.js';
+import {GALAXIES, GALAXY_DATA, DEFAULT_GALAXY_KEY} from './galaxyData.js';
 import { MAX_VELOCITY } from './galaxy.js';
+import {RAW_VELOCITY_DATA} from './rawData.js';
+
+
+const KPC_PER_DATA_POINT = 0.05;
+const KLY_PER_KPC = 3.26156;
 
 
 /**
- * TEXTURES is a map from galaxyKeys to PixiTextures. It's generated from
- * whatever image filepaths are put into the GALAXY_DATA found in the 
- * galaxyData.js module. Any Additional galaxies or images that are added 
- * there will be automatically added here.
- */
-const TEXTURES = Object.fromEntries(
-    Object.entries(GALAXY_DATA)
-    .map(([ key, val ]) => [ key, makeTexture(val.IMG) ])
-);
-
-/**
- * VelocityCurveOverlay displays pictures of real galaxy velocity curves.
- * The desired galaxy can be selected from the availiable images found in the
- * galaxyData.js module. The PIXI sprite will be changed to display the proper
- * image whenever you call the setImageTo(galaxyKey) method. The galaxy keys
- * are also found in the galaxyData.js module.
+ * VelocityCurveOverlay displays line plots of real galaxy velocity curves.
+ * The desired galaxy can be selected from the avaliable galaxies in the
+ * galaxyData module.
  */
 export default class VelocityCurveOverlay {
-    constructor() {
-        this._currentKey = DEFAULT_GALAXY_KEY;
-        this.sprite = new PIXI.Sprite(PIXI.Texture.EMPTY);
-        this.setImageTo(DEFAULT_GALAXY_KEY);
+    constructor(width, height, maxX, maxY) {
+        this.container = new PIXI.Container();
+        this.width = width;
+        this.height = height;
+        this.maxX = maxX;
+        this.maxY = maxY;
+        this.galaxyKey = DEFAULT_GALAXY_KEY;
+        // this.mask = makeGreenRectangle(width, height);
+        this.g = new PIXI.Graphics();
+
+        // this.g.mask = this.mask;
+        // this.container.addChild(this.mask);
+        this.container.addChild(this.g);
+        // this.update();
     }
 
-    getPixiObject() {
-        return this.sprite;
+
+    setMaxX(newMaxX) {
+        this.maxX = newMaxX;
+        this.update();
     }
 
-    setImageTo(galaxyKey) {
-        this._currentKey = galaxyKey;
-        this.sprite.texture = TEXTURES[galaxyKey];
+    setMaxY(newMaxY) {
+        this.maxY = newMaxY;
+        this.update();
     }
+
+    setGalaxy(galaxyKey) {
+        this.galaxyKey = galaxyKey;
+        this.update();
+    }
+
+    addToParent(parent) {
+        parent.addChild(this.container);
+    }
+
+    update() {
+
+        this.g.clear();
+
+        const ngc = GALAXY_DATA[this.galaxyKey].NGC;
+        if (ngc === null) {
+            return;
+        }
+
+        const data = RAW_VELOCITY_DATA[ngc];
+        const dataLength = data.length;
+        const PIXELS_PER_KLY = this.width / this.maxX;
+        const X_PIXELS_PER_KPC = PIXELS_PER_KLY * KLY_PER_KPC;
+        const X_PIXELS_PER_DATA_POINT = KPC_PER_DATA_POINT * X_PIXELS_PER_KPC;
+        
+        /* Draw the velocity curve using the dataset */
+        this.g.lineStyle(4, 0x2e8dd1);
+        this.g.moveTo(0, (this.maxY - data[0]) * this.height / this.maxY);
+        for (let k = 1; k < dataLength; k++) {
+            const x = k * X_PIXELS_PER_DATA_POINT;
+            const y = (this.maxY - data[k]) * this.height / this.maxY;
+            this.g.lineTo(x, y);
+            if (x > this.width) {
+                break;
+            }
+        }
+        this.g.endFill();
+    }
+
 }
 
-/**
- * Returns a PIXI Texture based on the image path string given. If given the 
- * parameter of "null", this wil assume you want a blank image, which is used
- * to enable the existence of a "no galaxy overlay" option in the simulation.
- */
-function makeTexture(imagePath) {
-    let texture = PIXI.Texture.EMPTY;
-    if (imagePath !== null) {
-        texture = PIXI.Texture.from(imagePath);
-    }
-    texture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-    return texture;
+
+function makeGreenRectangle(width, height) {
+    const g = new PIXI.Graphics();
+    g.beginFill(0x00ff00, 0.5);
+    g.drawRect(0, 0, width, height);
+    g.endFill();
+    return g;
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import Galaxy, {DEFAULT_DENSITY_DATA, MAX_DENSITY, MAX_VELOCITY, MAX_MASS_ENCLOSED} from './galaxy.js';
+import Galaxy, {DEFAULT_DENSITY_DATA, MAX_DENSITY, MAX_VELOCITY, MAX_MASS_ENCLOSED, MAX_RADIUS} from './galaxy.js';
 import * as PIXI from 'pixi.js-legacy';
 import {GALAXIES, GALAXY_DATA, DEFAULT_GALAXY_KEY} from './galaxyData.js';
 import VelocityCurveOverlay from './VelocityCurveOverlay.js'
@@ -103,7 +103,7 @@ export default class OrbitView extends React.Component {
         singleton = this;
         this.state = {};
 
-        this.velocityCurveOverlay = new VelocityCurveOverlay();
+        this.velocityCurveOverlay = null;
 
         this.objects = {
             densityRings: new PIXI.Container(),
@@ -167,8 +167,7 @@ export default class OrbitView extends React.Component {
         }
         if (this.props.galaxyChoice !== prevProps.galaxyChoice) {
             // console.log(this.props.galaxyChoice, GALAXY_DATA[this.props.galaxyChoice].NAME);
-            this.velocityCurveOverlay.setImageTo(this.props.galaxyChoice);
-            this.updateVelocityCurveOverlay();
+            this.velocityCurveOverlay.setGalaxy(this.props.galaxyChoice);
         }
 
         /* If one of the slider values has changed, then update graphics */
@@ -286,20 +285,12 @@ export default class OrbitView extends React.Component {
     }
 
     initVelocityCurveOverlay() {
-        this.velocityCurveOverlay.setImageTo(this.props.galaxyChoice);
-        this.velocityCurveOverlay.sprite.x = GRAPH_AXIS_LEFT_X;
-        this.velocityCurveOverlay.sprite.y = getGraphAxisTopY(1);
-        this.velocityCurveOverlay.sprite.width = GRAPH_AXIS_WIDTH;
-        this.velocityCurveOverlay.sprite.height = GRAPH_AXIS_HEIGHT;
-        this.objects.graphs.addChild(this.velocityCurveOverlay.sprite);
-        const mask = new PIXI.Graphics();
-        mask.beginFill(0x00ff00, 0.5);
-        mask.drawRect(0, 0, GRAPH_AXIS_WIDTH, GRAPH_AXIS_HEIGHT);
-        mask.endFill();
-        mask.x = GRAPH_AXIS_LEFT_X;
-        mask.y = getGraphAxisTopY(1);
-        this.velocityCurveOverlay.sprite.mask = mask;
-        this.objects.graphs.addChild(mask);
+        this.velocityCurveOverlay = new VelocityCurveOverlay(GRAPH_AXIS_WIDTH, GRAPH_AXIS_HEIGHT, MAX_RADIUS*11/10, MAX_VELOCITY);
+        this.velocityCurveOverlay.setGalaxy(this.props.galaxyChoice);
+        this.velocityCurveOverlay.container.x = GRAPH_AXIS_LEFT_X;
+        this.velocityCurveOverlay.container.y = getGraphAxisTopY(1);
+        this.objects.graphs.addChild(this.velocityCurveOverlay.container);
+        console.log(this.velocityCurveOverlay.container);
     }
 
     initGraphs() {
@@ -562,9 +553,12 @@ export default class OrbitView extends React.Component {
     }
 
     updateVelocityCurveOverlay() {
-        let scaleY = GALAXY_DATA[this.props.galaxyChoice].MAX_V / MAX_VELOCITY;
-        this.velocityCurveOverlay.sprite.height = GRAPH_AXIS_HEIGHT * scaleY;
-        this.velocityCurveOverlay.sprite.y = getGraphAxisBottomY(1) - this.velocityCurveOverlay.sprite.height;
+        if (MAX_VELOCITY !== this.velocityCurveOverlay.maxY) {
+            this.velocityCurveOverlay.setMaxY(MAX_VELOCITY);
+        }
+        // let scaleY = GALAXY_DATA[this.props.galaxyChoice].MAX_V / MAX_VELOCITY;
+        // this.velocityCurveOverlay.sprite.height = GRAPH_AXIS_HEIGHT * scaleY;
+        // this.velocityCurveOverlay.sprite.y = getGraphAxisBottomY(1) - this.velocityCurveOverlay.sprite.height;
     }
 
     updateDensityRings() {
