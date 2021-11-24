@@ -248,6 +248,7 @@ export default class OrbitView extends React.Component {
             const g = new PIXI.Container();
             g.x = g.pivot.x = ORBIT_VIEW_SIZE / 2;
             g.y = g.pivot.y = ORBIT_VIEW_SIZE / 2;
+            g.r = g.pivot.r = ORBIT_VIEW_SIZE * 0.05 * (2 * k + 1) / 2;
             this.galaxyShellContainers[k] = g;
             this.objects.galaxy.addChild(g);
         }
@@ -257,6 +258,7 @@ export default class OrbitView extends React.Component {
             const theta = Math.random() * 2 * Math.PI;
             dot.x = xPixels(R * Math.cos(theta));
             dot.y = yPixels(R * Math.sin(theta));
+            dot.r = R;
             this.galaxyShellContainers[getShellFromDot(R)].addChild(dot);
         }
         for (let k = 0; k < 10; k++) {
@@ -502,7 +504,11 @@ export default class OrbitView extends React.Component {
     updateGalaxy(delta) {
         for (let k = 0; k < 10; k++) {
             const speed = galaxy.getOrbitalVelocityNormalized(k);
-            this.galaxyShellContainers[k].rotation -= 0.01 * speed * delta;
+            //GSM edits 2021/11/23
+            //console.log(this.galaxyShellContainers[k]);
+            //console.log(k,this.galaxyShellContainers[k].r, 0.01 * speed * delta, speed * delta / this.galaxyShellContainers[k].r);
+            //this.galaxyShellContainers[k].rotation -= 0.01 * speed * delta ;
+            this.galaxyShellContainers[k].rotation -= speed * delta / this.galaxyShellContainers[k].r;
         }
     }
 
